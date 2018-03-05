@@ -1,0 +1,6 @@
+Put notes here, including example code:
+
+Tutorial on rendering opengl on top of camera preview. This is a little old, but hopefully it helps:
+
+https://digitalbreed.com/2009/11/14/android-render-opengl-on-top-of-camera-preview/
+
