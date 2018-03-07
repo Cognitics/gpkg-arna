@@ -1,0 +1,3 @@
+include ':app'
+include ':geopackage-sdk'
+project(':geopackage-sdk').projectDir = new File(settingsDir, '../geopackage-android/geopackage-sdk')
