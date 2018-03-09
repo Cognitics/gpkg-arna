@@ -19,8 +19,10 @@ import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 
+import static java.lang.Boolean.*;
+
 public class MainActivity extends AppCompatActivity {
-    GeoPackage gpkgDb;
+    private GeoPackage gpkgDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onSelectedFilePaths(String[] files) {
                         //files is an array of the paths of files selected by the Application User.
                         if(files.length > 0) {
-                            if(!openGeoPackage(files[0])); {
+                            if(!openGeoPackage(files[0])) {
                                 AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(MainActivity.this);
                                 dlgAlert.setMessage("Unable to open " + files[0]);
                                 dlgAlert.setTitle("Error");
@@ -61,13 +63,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public Boolean openGeoPackage(String path)
+    private Boolean openGeoPackage(String path)
     {
+        File f = new File(path);
+        String geoPackageName = f.getName();
         // Open a GeoPackage
         GeoPackageManager manager = GeoPackageFactory.getManager(this);
-
-        manager.importGeoPackage("test",new File(path));
-        gpkgDb = manager.open("test");
+        if(!manager.exists(geoPackageName)) {
+            manager.importGeoPackage(geoPackageName,f);
+        }
+        gpkgDb = manager.open(geoPackageName);
         if(gpkgDb != null) {
             StringBuilder message = new StringBuilder();
             message.append("Tables:\n");
@@ -77,9 +82,11 @@ public class MainActivity extends AppCompatActivity {
             }
             final EditText msgText = findViewById(R.id.messages);
             msgText.setText(message.toString());
-            return Boolean.TRUE;
+            return TRUE;
         }
-        return Boolean.FALSE;
+        else {
+            return FALSE;
+        }
 
     }
 }
