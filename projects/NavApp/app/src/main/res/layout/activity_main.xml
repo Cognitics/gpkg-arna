@@ -1,46 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="net.cognitics.navapp.MainActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context="net.cognitics.navapp.MainActivity">
 
-    <Button
-        android:id="@+id/openGpkg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Load GeoPackage"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="0dp"
-        android:layout_height="62dp"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@mipmap/coglogo" />
+<include layout="@layout/content_main" />
 
-    <EditText
-        android:id="@+id/messages"
-        android:layout_width="357dp"
-        android:layout_height="268dp"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:editable="false"
-        android:ems="10"
-        android:inputType="textMultiLine"
-        android:selectAllOnFocus="false"
-        android:singleLine="false"
-        app:layout_constraintBottom_toTopOf="@+id/imageView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:textSize="10sp" />
-
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>
