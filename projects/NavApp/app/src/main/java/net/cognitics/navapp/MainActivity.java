@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
@@ -231,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 message.append(distance);
                 message.append(" miles\n");
             }
-            final EditText msgText = (EditText) findViewById(R.id.messages);
+            final TextView msgText = (TextView) findViewById(R.id.messages);
             msgText.setText(message.toString());
             return TRUE;
         }
