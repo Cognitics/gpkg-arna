@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
     PermissionManager permissionManager;
 
     private GeoPackage gpkgDb;
-    GPSTracker gps;
+    private GPSTracker gps;
+    private String messageLog = new String();
 
     public MainActivity() {
         //NULL
@@ -77,15 +78,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Ask for runtime permission
-        permissionManager = new PermissionManager() {
-        };
-        permissionManager.checkAndRequestPermissions(this);
-        featureManager = new FeatureManager(this);
-        // Initalize Location tracker
-        gps = new GPSTracker(this);
-
-
+        if(savedInstanceState == null){
+            // Ask for runtime permission
+            permissionManager = new PermissionManager() {
+            };
+            permissionManager.checkAndRequestPermissions(this);
+            featureManager = new FeatureManager(this);
+            // Initalize Location tracker
+            gps = new GPSTracker(this);
+        }
         // Get camera stuff
         camera = Camera.open();
         cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
@@ -95,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
         //Bring constraint layout to front
         ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.Constraint);
         constraintLayout.bringToFront();
-
-
+        TextView msgText = (TextView) findViewById(R.id.messages);
+        msgText.setText(messageLog);
     }
 
     @Override
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean openGeoPackage(String path) {
         featureManager.open(path);
         Point geoPackageCenter = featureManager.getGeoCenter();
-        StringBuilder message = new StringBuilder();
+        StringBuilder messageBuilder = new StringBuilder();
 /*
         message.append("Center = ");
         message.append(geoPackageCenter.getY());
@@ -156,29 +157,31 @@ public class MainActivity extends AppCompatActivity {
         message.append(geoPackageCenter.getX());
         message.append("\n");
 */
-        message.append("Routes: ");
-        message.append(featureManager.routeFeatures.size());
-        message.append("\nCNPs: ");
-        message.append(featureManager.cnpFeatures.size());
-        message.append("\nPOIs: ");
-        message.append(featureManager.poiPointFeatures.size());
-        message.append("\nAOIs: ");
-        message.append(featureManager.aoiPointFeatures.size());
-        message.append("\n");
+        messageBuilder.append("Routes: ");
+        messageBuilder.append(featureManager.routeFeatures.size());
+        messageBuilder.append("\nCNPs: ");
+        messageBuilder.append(featureManager.cnpFeatures.size());
+        messageBuilder.append("\nPOIs: ");
+        messageBuilder.append(featureManager.poiPointFeatures.size());
+        messageBuilder.append("\nAOIs: ");
+        messageBuilder.append(featureManager.aoiPointFeatures.size());
+        messageBuilder.append("\n");
         if (!gps.canGetLocation()) {
             gps.showSettingsAlert();
         }
         if (!gps.canGetLocation()) {
-            message.append("GPS Not enabled.");
+            messageBuilder.append("GPS Not enabled.");
         } else {
             Point currPt = new Point(gps.getLongitude(), gps.getLatitude());
             double distance = GreatCircle.getDistanceMiles(geoPackageCenter, currPt);
-            message.append("Distance from here: ");
-            message.append(distance);
-            message.append(" miles\n");
+            messageBuilder.append("Distance from here: ");
+            messageBuilder.append(distance);
+            messageBuilder.append(" miles\n");
         }
-        final TextView msgText = (TextView) findViewById(R.id.messages);
-        msgText.setText(message.toString());
+        messageLog = messageBuilder.toString();
+        TextView msgText = (TextView) findViewById(R.id.messages);
+        msgText.setText(messageLog);
+
         return TRUE;
 }
 
