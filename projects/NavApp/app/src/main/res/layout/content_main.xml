@@ -19,31 +19,38 @@
             android:layout_marginTop="25dp"
             android:text="NULL"
             app:layout_constraintStart_toStartOf="parent"
+            android:textColor="#ffffff"
+
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/openGpkg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="248dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginTop="16dp"
             android:onClick="onClick"
             android:text="Select File"
             android:visibility="visible"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/messages"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
-            android:layout_marginTop="172dp"
-            android:text="SAMPLE"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:text=""
             android:textColor="#ffffff"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/openGpkg" />
 
     </android.support.constraint.ConstraintLayout>
 
@@ -51,8 +58,8 @@
         android:id="@+id/cameraPreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:visibility="visible"
         tools:layout_editor_absoluteX="0dp"

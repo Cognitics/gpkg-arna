@@ -1,5 +1,6 @@
 package net.cognitics.navapp;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,6 +11,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.FrameLayout;
+
 
 import com.karan.churi.PermissionManager.PermissionManager;
 
@@ -32,6 +34,7 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     Camera camera;
@@ -42,7 +45,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private GeoPackage gpkgDb;
     private GPSTracker gps;
-    private String messageLog = new String();
+
+    MainViewModel mViewModel;
 
 
     //Sensor Variables
@@ -76,15 +80,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Basic app creation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        TextView msgText = (TextView) findViewById(R.id.messages);
+        msgText.setText(mViewModel.messageLog);
         if (savedInstanceState == null) {
             // Ask for runtime permission
             permissionManager = new PermissionManager() {};
             permissionManager.checkAndRequestPermissions(this);
-            featureManager = new FeatureManager(this);
-            // Initalize Location tracker
-            gps = new GPSTracker(this);
-        }
+         }
         // Get camera stuff
         camera = Camera.open();
         cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
@@ -94,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //Bring constraint layout to front
         ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.Constraint);
         constraintLayout.bringToFront();
-        TextView msgText = (TextView) findViewById(R.id.messages);
-        msgText.setText(messageLog);
 
         // TextView that will tell the user what degree is he heading
         tvHeading = (TextView) findViewById(R.id.tvSensor);
@@ -137,12 +138,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         dlgAlert.setPositiveButton("OK", null);
                         dlgAlert.setCancelable(true);
                         dlgAlert.create().show();
+                        TextView msgText = (TextView) findViewById(R.id.messages);
+                        msgText.setText(mViewModel.messageLog);
                     }
+                    TextView msgText = (TextView) findViewById(R.id.messages);
+                    msgText.setText(mViewModel.messageLog);
                 }
             }
         });
         dialog.show();
-
     }
 
 
@@ -152,41 +156,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
 
     private Boolean openGeoPackage(String path) {
-        featureManager.open(path);
-        Point geoPackageCenter = featureManager.getGeoCenter();
-        StringBuilder messageBuilder = new StringBuilder();
-        /*
-                message.append("Center = ");
-                message.append(geoPackageCenter.getY());
-                message.append(", ");
-                message.append(geoPackageCenter.getX());
-                message.append("\n");
-        */
-        messageBuilder.append("Routes: ");
-        messageBuilder.append(featureManager.routeFeatures.size());
-        messageBuilder.append("\nCNPs: ");
-        messageBuilder.append(featureManager.cnpFeatures.size());
-        messageBuilder.append("\nPOIs: ");
-        messageBuilder.append(featureManager.poiPointFeatures.size());
-        messageBuilder.append("\nAOIs: ");
-        messageBuilder.append(featureManager.aoiPointFeatures.size());
-        messageBuilder.append("\n");
-        if (!gps.canGetLocation()) {
-            gps.showSettingsAlert();
-        }
-        if (!gps.canGetLocation()) {
-            messageBuilder.append("GPS Not enabled.");
-        } else {
-            Point currPt = new Point(gps.getLongitude(), gps.getLatitude());
-            double distance = GreatCircle.getDistanceMiles(geoPackageCenter, currPt);
-            messageBuilder.append("Distance from here: ");
-            messageBuilder.append(distance);
-            messageBuilder.append(" miles\n");
-        }
-        messageLog = messageBuilder.toString();
-        TextView msgText = (TextView) findViewById(R.id.messages);
-        msgText.setText(messageLog);
-
+        mViewModel.openGeoPackage(path);
         return TRUE;
     }
     @Override
