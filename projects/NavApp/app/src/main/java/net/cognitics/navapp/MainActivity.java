@@ -1,6 +1,10 @@
 package net.cognitics.navapp;
 
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -9,37 +13,15 @@ import android.widget.FrameLayout;
 
 import com.karan.churi.PermissionManager.PermissionManager;
 
-
-//import net.cognitics.navapp.GPSTracker;
 import android.view.View;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import mil.nga.geopackage.*;
-import mil.nga.geopackage.factory.GeoPackageFactory;
-import mil.nga.geopackage.features.user.FeatureCursor;
-import mil.nga.geopackage.features.user.FeatureDao;
-import mil.nga.geopackage.features.user.FeatureRow;
-import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.GeometryType;
-import mil.nga.wkb.geom.LineString;
 import mil.nga.wkb.geom.Point;
-import mil.nga.wkb.geom.Polygon;
 
-import com.github.angads25.filepicker.*;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
@@ -50,26 +32,43 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     Camera camera;
     FrameLayout cameraPreview;
     ShowCamera showCamera;
     FeatureManager featureManager;
-
     PermissionManager permissionManager;
 
     private GeoPackage gpkgDb;
     private GPSTracker gps;
     private String messageLog = new String();
 
+
+    //Sensor Variables
+    TextView tvHeading;
+    SensorManager mSensorManager;
+
+    private float bearing,pitch,roll;
+
+    protected float[] gravSensorVals;
+    protected float[] magSensorVals;
+    float RTmp[] = new float[9];
+    private float results[] = new float[3];
+    private float I[] = new float[9];
+    private float Rot[] = new float[9];
+
+    static final float ALPHA = 0.25f;
+
+    //
+
     public MainActivity() {
         //NULL
     }
 
     /*
-    * Runs on app launch
-    */
+     * Runs on app launch
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +77,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             // Ask for runtime permission
-            permissionManager = new PermissionManager() {
-            };
+            permissionManager = new PermissionManager() {};
             permissionManager.checkAndRequestPermissions(this);
             featureManager = new FeatureManager(this);
             // Initalize Location tracker
@@ -98,6 +96,13 @@ public class MainActivity extends AppCompatActivity {
         constraintLayout.bringToFront();
         TextView msgText = (TextView) findViewById(R.id.messages);
         msgText.setText(messageLog);
+
+        // TextView that will tell the user what degree is he heading
+        tvHeading = (TextView) findViewById(R.id.tvSensor);
+
+        // initialize your android device sensor capabilities
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
     }
 
     @Override
@@ -106,15 +111,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    * Functionality for choosing gpkg from files
-    * @param v View
+     * Functionality for choosing gpkg from files
+     * @param v View
      */
     public void onClick(View v) {
         DialogProperties properties = new DialogProperties();
         properties.selection_mode = DialogConfigs.SINGLE_MODE;
         properties.selection_type = DialogConfigs.FILE_SELECT;
         properties.root = new File(DialogConfigs.DEFAULT_DIR);
-        properties.root = new File("/");//DialogConfigs.DEFAULT_DIR);
+        properties.root = new File("/"); //DialogConfigs.DEFAULT_DIR);
         properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
         properties.offset = new File(DialogConfigs.DEFAULT_DIR);
         properties.extensions = null;
@@ -142,21 +147,21 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*
-    * Reads Geo Package
-    * @param path filepath for gpkg
+     * Reads Geo Package
+     * @param path filepath for gpkg
      */
 
     private Boolean openGeoPackage(String path) {
         featureManager.open(path);
         Point geoPackageCenter = featureManager.getGeoCenter();
         StringBuilder messageBuilder = new StringBuilder();
-/*
-        message.append("Center = ");
-        message.append(geoPackageCenter.getY());
-        message.append(", ");
-        message.append(geoPackageCenter.getX());
-        message.append("\n");
-*/
+        /*
+                message.append("Center = ");
+                message.append(geoPackageCenter.getY());
+                message.append(", ");
+                message.append(geoPackageCenter.getX());
+                message.append("\n");
+        */
         messageBuilder.append("Routes: ");
         messageBuilder.append(featureManager.routeFeatures.size());
         messageBuilder.append("\nCNPs: ");
@@ -183,7 +188,61 @@ public class MainActivity extends AppCompatActivity {
         msgText.setText(messageLog);
 
         return TRUE;
-}
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // for the system's orientation sensor registered listeners
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // to stop the listener and save battery
+        mSensorManager.unregisterListener(this);
+    }
 
 
+    @Override
+    public void onSensorChanged(SensorEvent evt) {
+        if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            gravSensorVals = lowPass(evt.values.clone(), gravSensorVals);
+        } else if (evt.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            magSensorVals = lowPass(evt.values.clone(), magSensorVals);
+        }
+        if (gravSensorVals != null && magSensorVals != null) {
+            SensorManager.getRotationMatrix(RTmp, I, gravSensorVals, magSensorVals);
+            int rotation = 1; //???
+            if (rotation == 1) {
+                SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
+            } else {
+                SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_Z, Rot);
+            }
+            SensorManager.getOrientation(Rot, results);
+            bearing = (float)(((results[0] * 180) / Math.PI) + 180);
+            pitch = (float)(((results[1] * 180 / Math.PI)) + 90);
+            roll = (float)(((results[2] * 180 / Math.PI)));
+            tvHeading.setText(" "+(int)bearing);
+        }
+    }
+
+
+    protected float[] lowPass(float[] input, float[] output) {
+        if (output == null) return input;
+        for (int i = 0; i < input.length; i++) {
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
 }
