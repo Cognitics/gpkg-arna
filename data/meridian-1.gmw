@@ -1,0 +1,452 @@
+GLOBAL_MAPPER_SCRIPT VERSION="1.00" FILENAME="C:\dev\gpkg-arna\data\meridian-1.gmw" \
+	 GM_VERSION="18.2.1" TIMESTAMP="2018-03-16T04:58:57Z"
+SET_BG_COLOR COLOR="RGB(255,255,255)"
+UNLOAD_ALL
+IMPORT_SPATIAL_DB TYPE="GEOPACKAGE" SDB_CONNECTION_FILE="C:\dev\gpkg-arna\data\meridian_openstreetmaps.gpkg" \
+	 SDB_TABLE_NAME="polygons_map" LAYER_GROUP="C:\dev\gpkg-arna\data\meridian_openstreetmaps.gpkg" \
+	 LABEL_FIELD_FORCE_OVERWRITE="NO" CODE_PAGE="65001" HIDDEN="YES"
+IMPORT_SPATIAL_DB TYPE="GEOPACKAGE" SDB_CONNECTION_FILE="C:\dev\gpkg-arna\data\meridian_openstreetmaps.gpkg" \
+	 SDB_TABLE_NAME="lines_map" LAYER_GROUP="C:\dev\gpkg-arna\data\meridian_openstreetmaps.gpkg" \
+	 LABEL_FIELD_FORCE_OVERWRITE="NO" CODE_PAGE="65001" HIDDEN="YES"
+IMPORT_SPATIAL_DB TYPE="GEOPACKAGE" SDB_CONNECTION_FILE="C:\dev\gpkg-arna\data\meridian_openstreetmaps.gpkg" \
+	 SDB_TABLE_NAME="points_map" LAYER_GROUP="C:\dev\gpkg-arna\data\meridian_openstreetmaps.gpkg" \
+	 LABEL_FIELD_FORCE_OVERWRITE="NO" CODE_PAGE="65001" HIDDEN="YES"
+EMBED_OVERLAY DATA_SIZE="1163" FEATURE_TEMPLATE="NO" LAYER_GROUP="route_meridian" \
+	 ELEV_UNITS="METERS" LABEL_FIELD_FORCE_OVERWRITE="NO" CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``%@```)(!``#"````5`(``&0```"X`@``%````!0```#,
+M`@```````"P```#,`@````````P```#,`@``#`````P```#8`@````````P`
+M``#8`@```````-@"``"S`0``BP0`````````````````````````````````
+M``````````````````````````````````````````````````"+!```````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````BP0`````````
+M`````````(L$`````````````````````````````/____^+!```````````
+M``"+!```````````````````%P!5<V5R($-R96%T960@1F5A='5R97,`4')O
+M:F5C=&EO;B`@("`@1T5/1U)!4$A)0PI$871U;2`@("`@("`@("!71U,X-`I:
+M=6YI=',@("`@("`@("!-151%4@I5;FET<R`@("`@("`@("!$1`I8<VAI9G0@
+M("`@("`@("`P+C`P,#`P,`I9<VAI9G0@("`@("`@("`P+C`P,#`P,`I087)A
+M;65T97)S"C`@,"`P+C`P,#`P("\J(&QO;F=I='5D92!O9B!C96YT97(@;V8@
+M<')O:F5C=&EO;@`Q,#$N,C0X.``S+CDP."!K;0!"14%224Y'`$Q%3D=42`!5
+M;FMN;W=N($QI;F4@5'EP90!L;VYG7W)O=71E7W)O8VMY`'XP?C4S-#@W-C$W
+M,'XP+C`P,'XP?C!^,38W-S<R,34``0``````(``````````````````A````
+M`````$0```"S`0"=```S`@`:"1(`&@```)T>1ZIJ&UW`3`D-!A[414#5#%X0
+M:QM=P$3<J!(%U$5`2#_:!VL;7<#H#>."_M-%0'2'ULQJ&UW`8^`\$OW314`#
+ML*97;QM=P.O5$='YTT5`V?]*^&\;7<"3JNTF^--%0)WGF:AO&UW`X9W7,]_3
+M14"?U$T8@QM=P$"F$"/?TT5`T<\OI8D;7<`&E)=&W=-%0"#(HF:0&UW`T/O1
+M&-?314#-"J!SDAM=P-0.?TW6TT5`I^C@SYX;7<"-:J&^W=-%0)\2/8"H&UW`
+MM\.B2=[314"*:A]#LAM=P##6K3_BTT5`@`'.G+\;7<#PKFF4Y--%0*C#D8J_
+M&UW`C;[3N0+314#N,@'EH1M=P+F68,?_TD5`C^8CA*(;7<"\(V.U^=)%0%QW
+M;HB9&UW`/TY@V_G214"0"X;!#1M=P/0K,!OXTD5`&$\5L'L:7<!KDZ7E]])%
+M0-X_%9-[&EW`J2BD5<;314"'@REO;!I=P([;>2S'TT5`BUPF>60:7<"S?H[J
+FS]-%0,=T,H)7&EW`WC&&@\[314#'=#*"5QI=P-XQAH/.TT5``@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!V
+M;G`V("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP-@!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QJ/YB.$HAM=P+PC8[7YTD5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`Q("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP,0!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QJ=YYFH;QM=P.&=US/?TT5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`R("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP,@!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QK1SR^EB1M=P`:4ET;=TT5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`S("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP,P!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QJ``<Z<OQM=P/"N:93DTT5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`T("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP-`!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QJHPY&*OQM=P(V^T[D"TT5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`U("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP-0!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QKN,@'EH1M=P+F68,?_TD5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`W("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP-P!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QH83Q6P>QI=P&N3I>7WTD5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`X("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP.`!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QK>/Q63>QI=P*DHI%7&TT5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="722" FEATURE_TEMPLATE="NO" LAYER_GROUP="cnp_meridian1" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``(P```)\!``#"````80(``$@```"I`@```````!0```"I
+M`@```````"P```"I`@````````P```"I`@````````P```"I`@``#`````P`
+M``"U`@```````+4"````````M0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#2`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````T@(`````````
+M`````````-("`````````````````````````````/_____2`@``````````
+M``#2`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!C
+M;G`Y("T@8VYP`%!R;VIE8W1I;VX@("`@($=%3T=205!(24,*1&%T=6T@("`@
+M("`@("`@5T=3.#0*6G5N:71S("`@("`@("`@345415(*56YI=',@("`@("`@
+M("`@1$0*6'-H:69T("`@("`@("`@,"XP,#`P,#`*67-H:69T("`@("`@("`@
+M,"XP,#`P,#`*4&%R86UE=&5R<PHP(#`@,"XP,#`P,"`O*B!L;VYG:71U9&4@
+M;V8@8V5N=&5R(&]F('!R;VIE8W1I;VX`1&]T`%5N:VYO=VX@4&]I;G0@1F5A
+M='5R90!C;G``8VYP.0!T>7!E`'XP?C4S-#<Y.3,W,GXP+C`P,'XP?C!^,38W
+M-S<R,34`!``````````H````'0``G0``'@$`(QK'=#*"5QI=P-XQAH/.TT5`
+"`@$`
+`
+end
+EMBED_OVERLAY DATA_SIZE="732" FEATURE_TEMPLATE="NO" LAYER_GROUP="poi_meridian" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``*````*0!``#"````9@(``$T```"S`@```````!0```"S
+M`@```````"P```"S`@````````P```"S`@````````P```"S`@``#`````P`
+M``"_`@```````+\"````````OP(``!T`````````````````````````````
+M``````````````````````````````````````````````````#<`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````W`(`````````
+M`````````-P"`````````````````````````````/_____<`@``````````
+M``#<`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!P
+M;VE?9VEN;W,@+2!P;VD`4')O:F5C=&EO;B`@("`@1T5/1U)!4$A)0PI$871U
+M;2`@("`@("`@("!71U,X-`I:=6YI=',@("`@("`@("!-151%4@I5;FET<R`@
+M("`@("`@("!$1`I8<VAI9G0@("`@("`@("`P+C`P,#`P,`I9<VAI9G0@("`@
+M("`@("`P+C`P,#`P,`I087)A;65T97)S"C`@,"`P+C`P,#`P("\J(&QO;F=I
+M='5D92!O9B!C96YT97(@;V8@<')O:F5C=&EO;@!$;W0`56YK;F]W;B!0;VEN
+M="!&96%T=7)E`'!O:0!P;VE?9VEN;W,`='EP90!^,'XU,S0W.3DS-S)^,"XP
+M,#!^,'XP?C$V-S<W,C$U``0`````````+0```!T``)T``!X!`"@:-4KRMY@;
+,7<`QA%)JY=)%0`(!
+`
+end
+EMBED_OVERLAY DATA_SIZE="732" FEATURE_TEMPLATE="NO" LAYER_GROUP="poi_meridian" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``*````*0!``#"````9@(``$T```"S`@```````!0```"S
+M`@```````"P```"S`@````````P```"S`@````````P```"S`@``#`````P`
+M``"_`@```````+\"````````OP(``!T`````````````````````````````
+M``````````````````````````````````````````````````#<`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````W`(`````````
+M`````````-P"`````````````````````````````/_____<`@``````````
+M``#<`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!P
+M;VE?<F]C:WD@+2!P;VD`4')O:F5C=&EO;B`@("`@1T5/1U)!4$A)0PI$871U
+M;2`@("`@("`@("!71U,X-`I:=6YI=',@("`@("`@("!-151%4@I5;FET<R`@
+M("`@("`@("!$1`I8<VAI9G0@("`@("`@("`P+C`P,#`P,`I9<VAI9G0@("`@
+M("`@("`P+C`P,#`P,`I087)A;65T97)S"C`@,"`P+C`P,#`P("\J(&QO;F=I
+M='5D92!O9B!C96YT97(@;V8@<')O:F5C=&EO;@!$;W0`56YK;F]W;B!0;VEN
+M="!&96%T=7)E`'!O:0!P;VE?<F]C:WD`='EP90!^,'XU,S0W.3DS-S)^,"XP
+M,#!^,'XP?C$V-S<W,C$U``0`````````+0```!T``)T``!X!`"@:V2"\66(:
+,7<#UOT85MM-%0`(!
+`
+end
+EMBED_OVERLAY DATA_SIZE="742" FEATURE_TEMPLATE="NO" LAYER_GROUP="poi_meridian" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``+0```*D!``#"````:P(``%(```"]`@```````!0```"]
+M`@```````"P```"]`@````````P```"]`@````````P```"]`@``#`````P`
+M``#)`@```````,D"````````R0(``!T`````````````````````````````
+M``````````````````````````````````````````````````#F`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````Y@(`````````
+M`````````.8"`````````````````````````````/_____F`@``````````
+M``#F`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!P
+M;VE?=V%L;&=R965N<R`M('!O:0!0<F]J96-T:6]N("`@("!'14]'4D%02$E#
+M"D1A='5M("`@("`@("`@(%='4S@T"EIU;FET<R`@("`@("`@($U%5$52"E5N
+M:71S("`@("`@("`@($1$"EAS:&EF="`@("`@("`@(#`N,#`P,#`P"EES:&EF
+M="`@("`@("`@(#`N,#`P,#`P"E!A<F%M971E<G,*,"`P(#`N,#`P,#`@+RH@
+M;&]N9VET=61E(&]F(&-E;G1E<B!O9B!P<F]J96-T:6]N`$1O=`!5;FMN;W=N
+M(%!O:6YT($9E871U<F4`<&]I`'!O:5]W86QL9W)E96YS`'1Y<&4`?C!^-3,T
+M-SDY,S<R?C`N,#`P?C!^,'XQ-C<W-S(Q-0`$`````````#(````=``"=```>
+6`0`M&M_PS!5O&EW`%E-$X0[314`"`0``
+`
+end
+EMBED_OVERLAY DATA_SIZE="736" FEATURE_TEMPLATE="NO" LAYER_GROUP="poi_meridian" LABEL_FIELD_FORCE_OVERWRITE="NO" \
+	 CLIP_COLLAR="NONE"
+M?`$!`!`!``!\`0``*@```*8!``#"````:`(``$\```"W`@```````!0```"W
+M`@```````"P```"W`@````````P```"W`@````````P```"W`@``#`````P`
+M``##`@```````,,"````````PP(``!T`````````````````````````````
+M``````````````````````````````````````````````````#@`@``````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````````````````
+M````````````````````````````````````````````````X`(`````````
+M`````````.`"`````````````````````````````/_____@`@``````````
+M``#@`@``````````````````%P!5<V5R($-R96%T960@1F5A='5R97,@+2!P
+M;VE?=V%L;6%R="`M('!O:0!0<F]J96-T:6]N("`@("!'14]'4D%02$E#"D1A
+M='5M("`@("`@("`@(%='4S@T"EIU;FET<R`@("`@("`@($U%5$52"E5N:71S
+M("`@("`@("`@($1$"EAS:&EF="`@("`@("`@(#`N,#`P,#`P"EES:&EF="`@
+M("`@("`@(#`N,#`P,#`P"E!A<F%M971E<G,*,"`P(#`N,#`P,#`@+RH@;&]N
+M9VET=61E(&]F(&-E;G1E<B!O9B!P<F]J96-T:6]N`$1O=`!5;FMN;W=N(%!O
+M:6YT($9E871U<F4`<&]I`'!O:5]W86QM87)T`'1Y<&4`?C!^-3,T-SDY,S<R
+M?C`N,#`P?C!^,'XQ-C<W-S(Q-0`$`````````"\````=``"=```>`0`J&C#U
+0%=OG&UW`G-#\MS?314`"`0``
+`
+end
+DEFINE_PROJ PROJ_NAME="GEO_WGS84"
+Projection     GEOGRAPHIC
+Datum          WGS84
+Zunits         NO
+Units          DD
+Xshift         0.000000
+Yshift         0.000000
+Parameters
+0 0 0.00000 /* longitude of center of projection
+END_DEFINE_PROJ
+LOAD_PROJECTION PROJ_NAME="GEO_WGS84"
+SET_VIEW GLOBAL_BOUNDS="-116.4494708115,43.6439230195,-116.4121688268,43.6670450594"
+
+/************ DEFINE MAP LAYOUT *************/
+MAP_LAYOUT
+ElevLegendBgColor=16777215
+ElevLegendTranslucency=384
+ElevLegendFont=~0~534799372~0.000~0~0~16777215
+ElevLegendVisible=1
+ElevLegendDisplayType=1
+ElevLegendDisplayUnits=1
+ElevLegendDisplayUnitsStr=
+ElevLegendCustomRangeMin=0
+ElevLegendCustomRangeMax=0
+ElevLegendRangeType=0
+ElevLegendTitle=
+ElevLegendSlopePercent=0
+
+DEFINE_PROJ_ELEV_LEGEND
+Projection     Fixed Screen Position
+Datum          D_ADINDAN
+Zunits         NO
+Units          RADIAN
+Xshift         0.000000
+Yshift         0.000000
+Parameters
+0.000000000 /* horz offset
+0.000000000 /* horz offset type (0 - left, 1 - right, 2 - center)
+0.000000000 /* horz offset value type (0 - inches, 1 - % width, 2 - deg lon)
+0.000000000 /* vert offset
+0.000000000 /* vert offset type (0 - top, 1 - bottom, 2 - center)
+0.000000000 /* vert offset value type (0 - inches, 1 - % width, 2 - deg lat)
+100.000000000 /* size value
+2.000000000 /* size value type (0 - % width, 1 - % height, 2 - pixel)
+1.000000000 /* always on top
+0.000000000 /* shrink to fit
+END_DEFINE_PROJ
+
+MapLegendType=0
+MapLegendBgColor=16776959
+MapLegendBorderStyle=0,2097152,0.0
+MapLegendTranslucency=512
+MapLegendFont=~0~534799368~0.000~0~0~16777215
+MapLegendFooterFont=~0~534799372~0.000~0~0~16777215
+MapLegendHeaderFont=~0~534799372~0.000~0~0~16777215
+MapLegendHeader=
+MapLegendFooter=
+MapLegendNumColumns=1
+MapLegendLabelAttr=
+MapLegendUseNaturalSort=0
+
+DEFINE_PROJ_MAP_LEGEND
+Projection     Fixed Screen Position
+Datum          D_ADINDAN
+Zunits         NO
+Units          RADIAN
+Xshift         0.000000
+Yshift         0.000000
+Parameters
+0.000000000 /* horz offset
+1.000000000 /* horz offset type (0 - left, 1 - right, 2 - center)
+0.000000000 /* horz offset value type (0 - inches, 1 - % width, 2 - deg lon)
+0.000000000 /* vert offset
+1.000000000 /* vert offset type (0 - top, 1 - bottom, 2 - center)
+0.000000000 /* vert offset value type (0 - inches, 1 - % width, 2 - deg lat)
+0.000000000 /* size value
+2.000000000 /* size value type (0 - % width, 1 - % height, 2 - pixel)
+1.000000000 /* always on top
+1.000000000 /* shrink to fit
+END_DEFINE_PROJ
+
+NorthArrowEnabled=0
+NorthArrowSymbol=
+NorthArrowSymbolScale=1.000000
+NorthArrowTranslucency=384
+
+DEFINE_PROJ_NORTH_ARROW
+Projection     Fixed Screen Position
+Datum          D_ADINDAN
+Zunits         NO
+Units          RADIAN
+Xshift         0.000000
+Yshift         0.000000
+Parameters
+0.000000000 /* horz offset
+1.000000000 /* horz offset type (0 - left, 1 - right, 2 - center)
+0.000000000 /* horz offset value type (0 - inches, 1 - % width, 2 - deg lon)
+0.000000000 /* vert offset
+0.000000000 /* vert offset type (0 - top, 1 - bottom, 2 - center)
+0.000000000 /* vert offset value type (0 - inches, 1 - % width, 2 - deg lat)
+100.000000000 /* size value
+2.000000000 /* size value type (0 - % width, 1 - % height, 2 - pixel)
+1.000000000 /* always on top
+0.000000000 /* shrink to fit
+END_DEFINE_PROJ
+
+ScaleBarBgColor=16777215
+ScaleBarTranslucency=384
+ScaleBarFont=~0~534799372~0.000~0~0~16777215
+ScaleVisible=1
+
+DEFINE_PROJ_SCALE
+Projection     Fixed Screen Position
+Datum          D_ADINDAN
+Zunits         NO
+Units          RADIAN
+Xshift         0.000000
+Yshift         0.000000
+Parameters
+0.000000000 /* horz offset
+0.000000000 /* horz offset type (0 - left, 1 - right, 2 - center)
+0.000000000 /* horz offset value type (0 - inches, 1 - % width, 2 - deg lon)
+0.000000000 /* vert offset
+1.000000000 /* vert offset type (0 - top, 1 - bottom, 2 - center)
+0.000000000 /* vert offset value type (0 - inches, 1 - % width, 2 - deg lat)
+0.000000000 /* size value
+2.000000000 /* size value type (0 - % width, 1 - % height, 2 - pixel)
+1.000000000 /* always on top
+0.000000000 /* shrink to fit
+END_DEFINE_PROJ
+
+GridDisplayType=0
+GridDisplayShowAll=0
+GridSpacingLatLon=0.00000000000000000
+GridSpacingProjected=0.00000000000000000
+END_MAP_LAYOUT

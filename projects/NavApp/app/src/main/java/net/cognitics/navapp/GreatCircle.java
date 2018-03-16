@@ -1,5 +1,7 @@
 package net.cognitics.navapp;
 import mil.nga.wkb.geom.Point;
+import mil.nga.wkb.util.GeometryUtils;
+
 /**
  * Created by kbentley on 3/8/2018.
  */
@@ -28,13 +30,44 @@ public class GreatCircle {
 
         double a = haversin(deltaLat) + Math.cos(startLat) * Math.cos(endLat) * haversin(deltaLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        //6,371,000 meter radius
         return 6371000 * c;
     }
 
+    /*
+     * Calculate the initial bearing from ptA to ptB. As one point moves this needs to be
+     * recalculated because in the great circle, the bearing changes as you follow the shortest path
+     */
     public static double getBearing(Point ptA, Point ptB)
     {
-        //todo: implement bearing
-        return 0;
+        if(getDistanceMeters(ptA,ptB)<10.0)
+            return 0;//It doesn't make much sense to calculate a bearing when they are this close
+        return _initial(ptA,ptB);
     }
+
+    public static double _initial(Point ptA, Point ptB)
+    {
+        return (_bearing(ptA,ptB) + 360.0) % 360;
+
+    }
+
+    public static double _final(Point ptA, Point ptB)
+    {
+        return (_bearing(ptA,ptB) + 180.0) % 360;
+    }
+
+    public static double _bearing(Point ptA, Point ptB)
+    {
+        double phi1 = Math.toRadians(ptA.getY());
+        double phi2 = Math.toRadians(ptB.getY());
+
+        double lam1 = Math.toRadians(ptA.getX());
+        double lam2 = Math.toRadians(ptB.getX());
+        return Math.atan2(
+                Math.sin(lam2-lam1)*Math.cos(phi2),
+                Math.cos(phi1)*Math.sin(phi2) - Math.sin(phi1)*Math.cos(phi2)*Math.cos(lam2-lam1)
+        ) * 180/Math.PI;
+
+
+    }
+
 }
