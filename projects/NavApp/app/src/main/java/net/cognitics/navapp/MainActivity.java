@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     //Sensor Variables
     TextView tvHeading;
     SensorManager mSensorManager;
-
+    CustomGraphics customGraphics;
     private float bearing,pitch,roll;
 
     protected float[] gravSensorVals;
@@ -103,6 +103,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        //ADD TO mViewModel
+
+        customGraphics = new CustomGraphics(this);
+
+        //
+
+
+        //TEST POINT
+        customGraphics.addPoint(cameraPreview,0,90);
+
+
 
     }
 
@@ -198,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             bearing = (float)(((results[0] * 180) / Math.PI) + 180);
             pitch = (float)(((results[1] * 180 / Math.PI)) + 90);
             roll = (float)(((results[2] * 180 / Math.PI)));
+            customGraphics.setViewModel(bearing,pitch);
+            customGraphics.updatePositions();
             tvHeading.setText(" "+(int)bearing);
         }
     }
