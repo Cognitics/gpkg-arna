@@ -23,7 +23,7 @@ public class CustomGraphics extends View
     float bearing=-1;
     float pitch;
     public Context context;
-
+    FrameLayout camera;
     private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
 
     {
@@ -52,19 +52,39 @@ public class CustomGraphics extends View
 
 
     public void updatePositions(){
-        int width = getWidth();
-        int height = getHeight();
-       // int x= width/2;
-       // int y=height/2;
+        int width = camera.getMeasuredWidth();
+        int height = camera.getMeasuredHeight();
              for (NavPoint n : navList){
-                 int tX = 0;
-                 int tY = 0;
+
+                 //Set X and Y to center of screen
+                 int tX = (width/2)-(n.getWidth()/2);
+                 int tY = (height/2)-(n.getHeight()/2);
+
+                 //Offset X and Y based on deltaPitch and deltaBearing
                  if (Math.abs(n.getBearing()-bearing)>180){
                      tX += 12 * ((n.getBearing()) - (bearing-360));
                  }else {
                      tX += 12 * ((n.getBearing()) - (bearing));
                  }
                  tY-=16*(n.getPitch()-(pitch));
+
+                 //Keep on screen if out of screen
+                 if (tY<0){
+                     //CASE: Off screen up
+                     tY=0;
+                 }else if (tY>height-n.getHeight()){
+                     //CASE: Off screen down
+                     tY=height-(n.getHeight());
+                 }
+                 if (tX<0){
+                     //CASE: Off screen to left
+                     tX=0;
+                 }else if (tX>width-n.getWidth()){
+                     //CASE: Off screen to right
+                     tX=width-(n.getWidth());
+                 }
+
+                 //Apply X and Y
                  n.setX((float)tX);
                  n.setY((float)tY);
              }
@@ -80,6 +100,7 @@ public class CustomGraphics extends View
     }
 
     public void addPoint(FrameLayout camera, float bearing, float pitch){
+        this.camera=camera;
         NavPoint newPoint = new NavPoint(context,bearing,pitch);
         newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
 

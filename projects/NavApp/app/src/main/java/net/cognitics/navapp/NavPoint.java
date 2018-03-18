@@ -17,8 +17,11 @@ public class NavPoint extends AppCompatImageButton{
         super(context);
         this.bearing=bearing;
         this.pitch=pitch;
-        setScaleX(.1f);
-        setScaleY(.1f);
+        //setScaleX(.1f);
+        //setScaleY(.1f);
+        setMinimumHeight(50);
+        setMinimumWidth(50);
+
     }
 
     public float getBearing(){
@@ -26,5 +29,17 @@ public class NavPoint extends AppCompatImageButton{
     }
     public float getPitch(){
         return pitch;
+    }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int measuredWidth = getDefaultSize(getSuggestedMinimumWidth(),
+                widthMeasureSpec);
+        int measuredHeight = getDefaultSize(getSuggestedMinimumHeight(),
+                heightMeasureSpec);
+        // Ensure this view is always square.
+        int min = Math.min(measuredHeight, measuredWidth);
+        setMeasuredDimension(min/10, min/10);
     }
 }
