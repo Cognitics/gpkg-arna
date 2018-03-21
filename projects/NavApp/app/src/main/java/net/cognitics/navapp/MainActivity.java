@@ -18,6 +18,7 @@ import com.karan.churi.PermissionManager.PermissionManager;
 import android.view.View;
 import android.support.v7.app.AlertDialog;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     //Sensor Variables
     TextView tvHeading;
     SensorManager mSensorManager;
-
+    CustomGraphics customGraphics;
     private float bearing,pitch,roll;
 
     protected float[] gravSensorVals;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float results[] = new float[3];
     private float I[] = new float[9];
     private float Rot[] = new float[9];
-
+    int resumeCamera=0;
     static final float ALPHA = 0.25f;
 
     //
@@ -103,6 +104,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        //ADD TO mViewModel
+
+        customGraphics = new CustomGraphics(this);
+
+        //
+
+
+        //TEST POINT
+        customGraphics.addPoint(cameraPreview,0,90);
+        customGraphics.addPoint(cameraPreview,90,90);
+        customGraphics.addPoint(cameraPreview,180,90);
+        customGraphics.addPoint(cameraPreview,270,90);
+        customGraphics.addPoint(cameraPreview,40,50);
+
+
 
     }
 
@@ -163,6 +180,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
 
+        //camera = Camera.open();
+        ///cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
+       // showCamera = new ShowCamera(this, camera);
+        //cameraPreview.addView(showCamera);
+        resumeCamera=1;
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
@@ -173,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
-
         // to stop the listener and save battery
         mSensorManager.unregisterListener(this);
     }
@@ -198,6 +219,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             bearing = (float)(((results[0] * 180) / Math.PI) + 180);
             pitch = (float)(((results[1] * 180 / Math.PI)) + 90);
             roll = (float)(((results[2] * 180 / Math.PI)));
+            customGraphics.setViewModel(bearing,pitch);
+            customGraphics.updatePositions();
+
+            //hotfix for camera being upside down in reverse landscape mode
+            showCamera.updateRoll((int)roll);
+            //hotfix for camera appearing black/crashing when app paused
+            if (resumeCamera==1){
+               // showCamera.resume();
+                resumeCamera=0;
+            }
             tvHeading.setText(" "+(int)bearing);
         }
     }
