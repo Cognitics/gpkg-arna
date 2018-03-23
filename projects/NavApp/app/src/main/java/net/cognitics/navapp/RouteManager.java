@@ -14,27 +14,87 @@ import mil.nga.wkb.geom.Point;
 
 public class RouteManager {
 
+    private double currentBearing;
+    private double currentDistance;
     // All available Routes. We'll use the first one for now.
-    private ArrayList<LineStringFeature> routes;
-    private LineStringFeature currentRoute;
+    private ArrayList<Point> currentRoute;
     // Position along the current route
-
+    private Point currentPositionGeo;
     // Index on current route vert (integer referencing a vert 0-n)
-    int nextRouteVert = 0;
+    private int nextIndex = 0;
 
-    RouteManager(ArrayList<LineStringFeature> routes)
+
+
+    public ArrayList getRoute() {
+        return currentRoute;
+    }
+
+    public void setRoute(ArrayList<Point> route) {
+        this.currentRoute = route;
+        nextIndex = 0;
+    }
+
+    /**
+     * Retrieves the index to the next point on the route, based on the current position
+     * specified in setCurrentPositionAndBearing()
+     * @return index into route
+     */
+    public int getNextIndex() {
+        return nextIndex;
+    }
+
+    RouteManager(ArrayList<Point> route)
     {
-        this.routes = routes;
-        if(routes.size()>0)
-            currentRoute = routes.get(0);
+        currentRoute = route;
+        currentBearing = 0;
+        currentDistance = 0;
+    }
+
+    /**
+     *
+     * @return  The position (in geographic coordinates) of the nearest point on the line from
+     *          the current position
+     */
+    private void calculateNearestLinePointGeo()
+    {
+        int numPoints = currentRoute.size();
+        if(numPoints<2)
+            return;
+        double nearestDistance =
+                GreatCircle.getDistanceMeters(currentPositionGeo, currentRoute.get(0));
+        for(int i=1;i<numPoints;i++)
+        {
+            double dist = GreatCircle.getDistanceMeters(currentPositionGeo, currentRoute.get(i));
+            if(dist < nearestDistance)
+            {
+                nearestDistance = dist;
+                nextIndex = i;
+            }
+        }
+    }
+
+    private void calculateNearestBearing()
+    {
+        currentBearing = GreatCircle.getBearing(currentPositionGeo,currentRoute.get(nextIndex));
     }
 
     //Get the geographic coordinates nearest the current position
-    Point getNearestRoutePointGeo(Point currentPosition)
+    public Point getNearestRoutePointGeo()
     {
-        return currentRoute.getNearestLinePointGeo(currentPosition);
+        return currentRoute.get(nextIndex);
     }
 
-    //double getNearestBearing()
+    //The nearest distance and bearing are only calculated here, so call this before getting those
+    public void setCurrentPositionAndBearing(double latitude, double longitude, double elevation, double bearing)
+    {
+        currentPositionGeo = new Point(longitude,latitude);
+        calculateNearestLinePointGeo();
+        calculateNearestBearing();
+    }
+
+    double getNearestBearing()
+    {
+        return currentBearing;
+    }
 
 }
