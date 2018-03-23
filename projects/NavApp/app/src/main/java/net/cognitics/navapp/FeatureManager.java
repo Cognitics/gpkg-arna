@@ -92,7 +92,8 @@ public class FeatureManager {
                             if (colName != featureRow.getGeometryColumn().getName()) {
                                 String attrName = featureRow.getColumn(colName).getName();
                                 Object attrValue = featureRow.getValue(colName);
-                                attributes.put(attrName, attrValue.toString());
+                                if(attrValue!=null)
+                                    attributes.put(attrName, attrValue.toString());
                             }
                         }
 

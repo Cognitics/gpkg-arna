@@ -13,7 +13,7 @@ public class LineStringFeature {
     // Layer name (table in the geopackage file)
     private String layerName;
     private LineString utmLine;
-
+    private LineString geoLine;
     // Feature ID
     private int fid;
     //attributes (key/value pairs, stored as a dictionary)
@@ -22,6 +22,7 @@ public class LineStringFeature {
     // Will convert to UTM
     LineStringFeature(LineString line, Map<String, String> attributes)
     {
+        this.geoLine = line;
         utmLine = new LineString();
         this.attributes = attributes;
         for(Point pt : line.getPoints())
@@ -36,5 +37,25 @@ public class LineStringFeature {
             utmLine.addPoint(utmPoint);
         }
 
+    }
+
+    Point getNearestLinePointGeo(Point currentPosition)
+    {
+        int numPoints = geoLine.getPoints().size();
+        if(numPoints<2)
+            return null;
+        double nearestDistance =
+                GreatCircle.getDistanceMeters(currentPosition, geoLine.getPoints().get(0));
+        Point nearestPoint = geoLine.getPoints().get(0);
+        for(int i=1;i<numPoints;i++)
+        {
+            double dist = GreatCircle.getDistanceMeters(currentPosition, geoLine.getPoints().get(i));
+            if(dist < nearestDistance)
+            {
+                nearestDistance = dist;
+                nearestPoint = geoLine.getPoints().get(i);
+            }
+        }
+        return nearestPoint;
     }
 }
