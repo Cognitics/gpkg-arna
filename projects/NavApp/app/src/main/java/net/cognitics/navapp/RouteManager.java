@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import mil.nga.wkb.geom.Point;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 /**
  * Created by kbentley on 3/13/2018.
  *
@@ -23,7 +26,18 @@ public class RouteManager {
     // Index on current route vert (integer referencing a vert 0-n)
     private int nextIndex = 0;
 
+    private boolean needsUpdate;
 
+    private void updateRoute()
+    {
+        if(needsUpdate)
+        {
+            calculateNearestBearing();
+            // gets the point and the distance
+            calculateNearestLinePointGeo();
+            needsUpdate = FALSE;
+        }
+    }
 
     public ArrayList getRoute() {
         return currentRoute;
@@ -45,9 +59,13 @@ public class RouteManager {
 
     RouteManager(ArrayList<Point> route)
     {
-        currentRoute = route;
+        currentRoute = new ArrayList<Point>(route.size());
+        for (Point pt: route){
+            currentRoute.add(pt);
+        }
         currentBearing = 0;
         currentDistance = 0;
+        needsUpdate = TRUE;
     }
 
     /**
@@ -60,14 +78,14 @@ public class RouteManager {
         int numPoints = currentRoute.size();
         if(numPoints<2)
             return;
-        double nearestDistance =
+        currentDistance =
                 GreatCircle.getDistanceMeters(currentPositionGeo, currentRoute.get(0));
-        for(int i=1;i<numPoints;i++)
+        for(int i=nextIndex;i<numPoints;i++)
         {
             double dist = GreatCircle.getDistanceMeters(currentPositionGeo, currentRoute.get(i));
-            if(dist < nearestDistance)
+            if(dist < currentDistance)
             {
-                nearestDistance = dist;
+                currentDistance = dist;
                 nextIndex = i;
             }
         }
@@ -81,6 +99,7 @@ public class RouteManager {
     //Get the geographic coordinates nearest the current position
     public Point getNearestRoutePointGeo()
     {
+        updateRoute();
         return currentRoute.get(nextIndex);
     }
 
@@ -88,13 +107,19 @@ public class RouteManager {
     public void setCurrentPositionAndBearing(double latitude, double longitude, double elevation, double bearing)
     {
         currentPositionGeo = new Point(longitude,latitude);
-        calculateNearestLinePointGeo();
-        calculateNearestBearing();
+        needsUpdate = TRUE;
     }
 
     double getNearestBearing()
     {
+        updateRoute();
         return currentBearing;
+    }
+
+    double getNearestDistance()
+    {
+        updateRoute();
+        return currentDistance;
     }
 
 }
