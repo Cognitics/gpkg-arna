@@ -41,11 +41,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     Camera camera;
     FrameLayout cameraPreview;
     ShowCamera showCamera;
-    FeatureManager featureManager;
     PermissionManager permissionManager;
-
-    private GeoPackage gpkgDb;
-    private GPSTracker gps;
 
     MainViewModel mViewModel;
 
@@ -63,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float I[] = new float[9];
     private float Rot[] = new float[9];
     int resumeCamera=0;
-    static final float ALPHA = 0.25f;
+    static final float ALPHA = 0.05f;
 
     //
 
@@ -220,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             pitch = (float)(((results[1] * 180 / Math.PI)) + 90);
             roll = (float)(((results[2] * 180 / Math.PI)));
             customGraphics.setViewModel(bearing,pitch);
-            customGraphics.updatePositions();
+
 
             //hotfix for camera being upside down in reverse landscape mode
             showCamera.updateRoll((int)roll);
@@ -230,6 +226,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 resumeCamera=0;
             }
             tvHeading.setText(" "+(int)bearing);
+
+            RouteManager rm = mViewModel.getRouteManager();
+            if(rm!=null) {
+                rm.setCurrentPositionAndBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation(), bearing);
+                customGraphics.clearPoints();
+                double b = rm.getNearestBearing();
+                double d = rm.getNearestDistance();
+                int idx = rm.getNextIndex();
+                mViewModel.setMessageLog("Distance: " + d + "\nBearing: " + b + "\nIndex: " + idx);
+                TextView msgText = (TextView) findViewById(R.id.messages);
+                msgText.setText(mViewModel.messageLog);
+                customGraphics.addPoint(cameraPreview, (float) b, 90);
+                customGraphics.updatePositions();
+            }
         }
     }
 

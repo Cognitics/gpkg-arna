@@ -17,8 +17,18 @@ import static java.lang.Boolean.TRUE;
 public class MainViewModel extends AndroidViewModel {
 
     private GeoPackage gpkgDb;
+
+    public GPSTracker getGps() {
+        return gps;
+    }
+
     private GPSTracker gps;
     FeatureManager featureManager;
+
+    public void setMessageLog(String messageLog) {
+        this.messageLog = messageLog;
+    }
+
     public String messageLog = new String();
 
     public MainViewModel(@NonNull Application application) {
@@ -76,4 +86,8 @@ public class MainViewModel extends AndroidViewModel {
         return TRUE;
     }
 
+    RouteManager getRouteManager()
+    {
+        return featureManager.getRouteManager();
+    }
 }

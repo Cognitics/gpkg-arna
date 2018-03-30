@@ -114,6 +114,10 @@ public class CustomGraphics extends View
         camera.addView(newPoint);
     }
     public void clearPoints(){
+        for(View v : navList)
+        {
+            camera.removeView(v);
+        }
         navList.clear();
     }
 
