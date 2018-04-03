@@ -16,8 +16,10 @@ public class GreatCircle {
         return getDistanceMeters(ptA,ptB)/1609.34;
     }
 
-    public static double getDistanceMeters(Point ptA, Point ptB)
+    public static double getDistanceMeters(Point pt1, Point pt2)
     {
+        Point ptA = new Point(pt1);
+        Point ptB = new Point(pt2);
         ptA.setX(Math.toRadians(ptA.getX()));
         ptA.setY(Math.toRadians(ptA.getY()));
         ptB.setX(Math.toRadians(ptB.getX()));

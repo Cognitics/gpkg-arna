@@ -17,8 +17,18 @@ import static java.lang.Boolean.TRUE;
 public class MainViewModel extends AndroidViewModel {
 
     private GeoPackage gpkgDb;
+
+    public GPSTracker getGps() {
+        return gps;
+    }
+
     private GPSTracker gps;
     FeatureManager featureManager;
+
+    public void setMessageLog(String messageLog) {
+        this.messageLog = messageLog;
+    }
+
     public String messageLog = new String();
 
     public MainViewModel(@NonNull Application application) {
@@ -29,7 +39,8 @@ public class MainViewModel extends AndroidViewModel {
 
     public Boolean openGeoPackage(String path) {
         featureManager.open(path);
-        Point geoPackageCenter = featureManager.getGeoCenter();
+        //Point geoPackageCenter = featureManager.getGeoCenter();
+
         StringBuilder messageBuilder = new StringBuilder();
         /*
                 message.append("Center = ");
@@ -38,8 +49,8 @@ public class MainViewModel extends AndroidViewModel {
                 message.append(geoPackageCenter.getX());
                 message.append("\n");
         */
-        messageBuilder.append("Routes: ");
-        messageBuilder.append(featureManager.routeFeatures.size());
+        messageBuilder.append("Routes points: ");
+        messageBuilder.append(featureManager.getRouteManager().getRoute().size());
         messageBuilder.append("\nCNPs: ");
         messageBuilder.append(featureManager.cnpFeatures.size());
         messageBuilder.append("\nPOIs: ");
@@ -53,15 +64,30 @@ public class MainViewModel extends AndroidViewModel {
         if (!gps.canGetLocation()) {
             messageBuilder.append("GPS Not enabled.");
         } else {
+            double bearing = 99;
             Point currPt = new Point(gps.getLongitude(), gps.getLatitude());
-            double distance = GreatCircle.getDistanceMiles(geoPackageCenter, currPt);
+            RouteManager rm = featureManager.getRouteManager();
+            Point nextRoutePoint = currPt;
+            if(rm != null)
+            {
+                rm.setCurrentPositionAndBearing(nextRoutePoint.getY(),nextRoutePoint.getX(),0,0);//todo: get bearing and altitude
+                nextRoutePoint = rm.getNearestRoutePointGeo();
+                bearing = rm.getNearestBearing();
+            }
+            double distance = GreatCircle.getDistanceMiles(nextRoutePoint, currPt);
             messageBuilder.append("Distance from here: ");
             messageBuilder.append(distance);
             messageBuilder.append(" miles\n");
+            messageBuilder.append("Bearing: " + Double.valueOf(bearing).toString() + "\n");
         }
         messageLog = messageBuilder.toString();
+
 
         return TRUE;
     }
 
+    RouteManager getRouteManager()
+    {
+        return featureManager.getRouteManager();
+    }
 }

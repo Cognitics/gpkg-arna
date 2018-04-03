@@ -3,6 +3,7 @@ package net.cognitics.navapp;
 import android.content.Context;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,9 @@ import static java.lang.Boolean.TRUE;
  * Created by kbentley on 3/11/2018.
  */
 
+//todo: Add support for named routes/poi/cnp (e.g. route_tampa/cnp_tampa and route_meridian,cnp_meridian in the same db
+    // todo: Attributes for routes
+
 public class FeatureManager {
 
     public ArrayList<PointFeature> getCnpFeatures() {
@@ -41,7 +45,13 @@ public class FeatureManager {
     private GeoPackage gpkgDb;
     private GeoPackageManager manager;
     private Point geoCenter;
-    FeatureManager(Context context)
+
+    public RouteManager getRouteManager() {
+        return routeManager;
+    }
+
+    private RouteManager routeManager;
+    public FeatureManager(Context context)
     {
 
         cnpFeatures = new ArrayList<PointFeature>();
@@ -51,21 +61,41 @@ public class FeatureManager {
         gpkgDb = null;
         manager = GeoPackageFactory.getManager(context);
         geoCenter = new Point();
+        routeManager = null;
     }
 
-    void ProcessPoint(Point pt, HashMap<String, String> attributes)
+    private void processRoute(LineString ls, String table)
+    {
+        int numVerts = 0;
+        double totalX = 0;
+        double totalY = 0;
+        ArrayList<Point> routePoints = new ArrayList<Point>();
+        for (Point pt : ls.getPoints()) {
+            totalX += pt.getX();
+            totalY += pt.getY();
+            routePoints.add(pt);
+            numVerts++;
+        }
+        if (table.startsWith("route_")) {
+            routeManager = new RouteManager(routePoints);
+        }
+        geoCenter.setX(totalX / numVerts);
+        geoCenter.setY(totalY / numVerts);
+    }
+
+    private void ProcessPoint(Point pt, HashMap<String, String> attributes)
     {
 
     }
 
-    void ProcessMultiPoint(MultiPoint mpt, HashMap<String, String> attributes)
+    private void ProcessMultiPoint(MultiPoint mpt, HashMap<String, String> attributes)
     {
         for (Point pt: mpt.getPoints() ) {
             ProcessPoint(pt, attributes);
         }
     }
 
-    Boolean open(String fileName) {
+    public Boolean open(String fileName) {
         File f = new File(fileName);
         String geoPackageName = f.getName();
         // Open a GeoPackage
@@ -101,28 +131,18 @@ public class FeatureManager {
                             }
                         }
 
+
                         GeoPackageGeometryData geometryData = featureRow.getGeometry();
                         Geometry geometry = geometryData.getGeometry();
                         if (geometry instanceof LineString) {
-                            LineString line = (LineString) geometry;
-                            for (Point pt : line.getPoints()) {
-                                totalX += pt.getX();
-                                totalY += pt.getY();
-                                numVerts++;
-                            }
-                            LineStringFeature lineFeature = new LineStringFeature(line, attributes);
-                            routeFeatures.add(lineFeature);
+                            LineString line = (LineString)geometry;
+                            processRoute(line,table);
+
                         } else if(geometry instanceof MultiLineString) {
                             MultiLineString mls = (MultiLineString)geometry;
                             for(LineString line: mls.getGeometries())
                             {
-                                for (Point pt : line.getPoints()) {
-                                    totalX += pt.getX();
-                                    totalY += pt.getY();
-                                    numVerts++;
-                                }
-                                LineStringFeature lineFeature = new LineStringFeature(line, attributes);
-                                routeFeatures.add(lineFeature);
+                                processRoute(line,table);
                             }
 
                         } else if (geometry instanceof Point) {
@@ -172,8 +192,7 @@ public class FeatureManager {
                 }
 
             }
-            geoCenter.setX(totalX / numVerts);
-            geoCenter.setY(totalY / numVerts);
+
 
         } else {
             return FALSE;

@@ -14,12 +14,33 @@ public class LineStringFeature {
     private String layerName;
     private LineString utmLine;
     private LineString geoLine;
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        if(currentIndex <0)
+            currentIndex = 0;
+        if(currentIndex >= geoLine.numPoints())
+            currentIndex = geoLine.numPoints();
+        this.currentIndex = currentIndex;
+    }
+
+    /**
+     * The index of the current position within the linestring. updated with calls to getNearestLinePointGeo()
+     */
+    private int currentIndex;
     // Feature ID
     private int fid;
     //attributes (key/value pairs, stored as a dictionary)
     private Map<String, String> attributes;
 
-    // Will convert to UTM
+    /**
+     *
+     * @param line A LineString in geographic (latitude/longitude) coordinates.
+     * @param attributes Key/Value pairs with any attributes needed by the client
+     */
     LineStringFeature(LineString line, Map<String, String> attributes)
     {
         this.geoLine = line;
@@ -32,13 +53,21 @@ public class LineStringFeature {
             UTM utm = new UTM(geo);
             Point utmPoint = new Point();
             utmPoint.setX(utm.getEasting());
-            utmPoint.setX(utm.getNorthing());
+            utmPoint.setY(utm.getNorthing());
             utmPoint.setZ(pt.getZ());
             utmLine.addPoint(utmPoint);
         }
 
     }
 
+    /**
+     *
+     * @param currentPosition The current position in geographic (latitude/longitude/elevation
+     *                        coordinates. The currentIndex will be updated based on this
+     *                        calculation
+     * @return  The position (in geographic coordinates) of the nearest point on the line from
+     *          the current position
+     */
     Point getNearestLinePointGeo(Point currentPosition)
     {
         int numPoints = geoLine.getPoints().size();
@@ -54,6 +83,7 @@ public class LineStringFeature {
             {
                 nearestDistance = dist;
                 nearestPoint = geoLine.getPoints().get(i);
+                currentIndex = i;
             }
         }
         return nearestPoint;
