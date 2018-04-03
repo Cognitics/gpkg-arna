@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class CustomGraphics extends View
@@ -24,10 +25,8 @@ public class CustomGraphics extends View
     float pitch;
     public Context context;
     FrameLayout camera;
-    private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
-
-    {
-    }
+    //private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
+    private HashMap<String,NavPoint> navMap=new HashMap<String,NavPoint>();
 
     public CustomGraphics(Context con)
     {
@@ -54,7 +53,7 @@ public class CustomGraphics extends View
     public void updatePositions(){
         int width = camera.getMeasuredWidth();
         int height = camera.getMeasuredHeight();
-             for (NavPoint n : navList){
+             for (NavPoint n : navMap.values()){
 
                  //Set X and Y to center of screen
                  int tX = (width/2)-(n.getWidth()/2);
@@ -92,14 +91,17 @@ public class CustomGraphics extends View
     }
 
 
-
-
     public void setViewModel(float bearing, float pitch){
         this.bearing=bearing;
         this.pitch=pitch;
     }
 
-    public void addPoint(FrameLayout camera, float bearing, float pitch){
+    public void addPoint(FrameLayout camera, float bearing, float pitch, String id){
+        if(navMap.containsKey(id))
+        {
+            updatePoint(bearing,pitch,id);
+            return;
+        }
         this.camera=camera;
         NavPoint newPoint = new NavPoint(context,bearing,pitch);
         newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
@@ -110,15 +112,24 @@ public class CustomGraphics extends View
                                         }
                                     });
 
-        navList.add(newPoint);
+        navMap.put(id,newPoint);
         camera.addView(newPoint);
     }
+
+    public void updatePoint(float bearing, float pitch, String id)
+    {
+        if(navMap.containsKey(id))
+        {
+           navMap.get(id).setBearing(bearing);
+           navMap.get(id).setPitch(pitch);
+        }
+    }
     public void clearPoints(){
-        for(View v : navList)
+        for(View v : navMap.values())
         {
             camera.removeView(v);
         }
-        navList.clear();
+        navMap.clear();
     }
 
 

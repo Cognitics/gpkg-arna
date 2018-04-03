@@ -110,11 +110,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
         //TEST POINT
-        customGraphics.addPoint(cameraPreview,0,90);
-        customGraphics.addPoint(cameraPreview,90,90);
-        customGraphics.addPoint(cameraPreview,180,90);
-        customGraphics.addPoint(cameraPreview,270,90);
-        customGraphics.addPoint(cameraPreview,40,50);
+        //customGraphics.addPoint(cameraPreview,0,90);
+        //customGraphics.addPoint(cameraPreview,90,90);
+        //customGraphics.addPoint(cameraPreview,180,90);
+        //customGraphics.addPoint(cameraPreview,270,90);
+        //customGraphics.addPoint(cameraPreview,40,50);
 
 
 
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             tvHeading.setText(" "+(int)bearing);
 
-            customGraphics.clearPoints();
+            //customGraphics.clearPoints();
             ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();
             for(PointFeature pointFeature : cnpFeatures)
             {
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //todo: add different colors for cnp point to differentiate from the next route point
                 //todo: make them clickable?
                 //todo: When I enable the following line, the screen doesn't refresh on my phone
-                //customGraphics.addPoint(cameraPreview, (float) b, 90);
+                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()));
             }
             RouteManager rm = mViewModel.getRouteManager();
             if(rm!=null) {
@@ -245,10 +245,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double b = rm.getNearestBearing();
                 double d = rm.getNearestDistance();
                 int idx = rm.getNextIndex();
-                mViewModel.setMessageLog("Distance: " + d + "\nBearing: " + b + "\nIndex: " + idx);
+                mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d",d/1000.0,b,idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90);
+                customGraphics.addPoint(cameraPreview, (float) b, 90,"route_point");
                 customGraphics.updatePositions();
             }
         }

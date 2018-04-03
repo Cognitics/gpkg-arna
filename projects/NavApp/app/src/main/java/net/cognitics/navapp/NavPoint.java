@@ -8,6 +8,14 @@ import android.support.v7.widget.AppCompatImageButton;
  */
 
 public class NavPoint extends AppCompatImageButton{
+    public void setBearing(float bearing) {
+        this.bearing = bearing;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
     private float bearing,pitch;
 
     public NavPoint(Context context) {

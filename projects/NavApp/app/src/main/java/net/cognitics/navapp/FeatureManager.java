@@ -40,6 +40,11 @@ public class FeatureManager {
 
     public ArrayList<PointFeature> cnpFeatures;
     public ArrayList<PointFeature> poiPointFeatures;
+
+    public ArrayList<PointFeature> getAoiPointFeatures() {
+        return aoiPointFeatures;
+    }
+
     public ArrayList<PointFeature> aoiPointFeatures;
     public ArrayList<LineStringFeature> routeFeatures;
     private GeoPackage gpkgDb;
@@ -64,7 +69,7 @@ public class FeatureManager {
         routeManager = null;
     }
 
-    private void processRoute(LineString ls, String table)
+    private void processRoute(LineString ls, String table,HashMap<String, String> attributes,int fid)
     {
         int numVerts = 0;
         double totalX = 0;
@@ -77,23 +82,12 @@ public class FeatureManager {
             numVerts++;
         }
         if (table.startsWith("route_")) {
-            routeManager = new RouteManager(routePoints);
+            routeManager = new RouteManager(routePoints,attributes,fid);
         }
         geoCenter.setX(totalX / numVerts);
         geoCenter.setY(totalY / numVerts);
     }
 
-    private void ProcessPoint(Point pt, HashMap<String, String> attributes)
-    {
-
-    }
-
-    private void ProcessMultiPoint(MultiPoint mpt, HashMap<String, String> attributes)
-    {
-        for (Point pt: mpt.getPoints() ) {
-            ProcessPoint(pt, attributes);
-        }
-    }
 
     public Boolean open(String fileName) {
         File f = new File(fileName);
@@ -118,16 +112,25 @@ public class FeatureManager {
 
                 try {
                     while (featureCursor.moveToNext()) {
+                        int fid = 0;
                         FeatureRow featureRow = featureCursor.getRow();
                         String[] colNames = featureCursor.getColumnNames();
                         HashMap<String, String> attributes = new HashMap<String, String>();
                         // Just convert everything to a string for now.
                         for (String colName : colNames) {
-                            if (colName != featureRow.getGeometryColumn().getName()) {
+                            if (!colName.equalsIgnoreCase(featureRow.getGeometryColumn().getName())) {
+
                                 String attrName = featureRow.getColumn(colName).getName();
                                 Object attrValue = featureRow.getValue(colName);
                                 if(attrValue!=null)
                                     attributes.put(attrName, attrValue.toString());
+                                if(colName.equalsIgnoreCase("fid"))
+                                {
+                                    // Weird double conversion here to make sure the
+                                    // fid is parsed no matter what it's type
+                                    if(attrValue!=null)
+                                        fid = Integer.valueOf(attrValue.toString());
+                                }
                             }
                         }
 
@@ -136,18 +139,18 @@ public class FeatureManager {
                         Geometry geometry = geometryData.getGeometry();
                         if (geometry instanceof LineString) {
                             LineString line = (LineString)geometry;
-                            processRoute(line,table);
+                            processRoute(line,table,attributes,fid);
 
                         } else if(geometry instanceof MultiLineString) {
                             MultiLineString mls = (MultiLineString)geometry;
                             for(LineString line: mls.getGeometries())
                             {
-                                processRoute(line,table);
+                                processRoute(line,table,attributes,fid);
                             }
 
                         } else if (geometry instanceof Point) {
                             Point pt = (Point) geometry;
-                            PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), 0);
+                            PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid);
                             feature.setAttributes(attributes);
                             if (table.startsWith("cnp_")) {
                                 cnpFeatures.add(feature);
@@ -163,7 +166,7 @@ public class FeatureManager {
                         {
                           MultiPoint mp = (MultiPoint)geometry;
                           for(Point pt : mp.getGeometries()) {
-                                PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), 0);
+                                PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid);
                                 feature.setAttributes(attributes);
                                 if (table.startsWith("cnp_")) {
                                     cnpFeatures.add(feature);

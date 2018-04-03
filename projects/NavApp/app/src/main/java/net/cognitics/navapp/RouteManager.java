@@ -1,6 +1,7 @@
 package net.cognitics.navapp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import mil.nga.wkb.geom.Point;
 
@@ -30,6 +31,10 @@ public class RouteManager {
     private int nextIndex = 0;
 
     private boolean needsUpdate;
+
+    private int fid = 0;//feature id from the geopackage. Should always be 0
+
+    private HashMap<String, String> attributes;
 
     private void updateRoute()
     {
@@ -78,7 +83,7 @@ public class RouteManager {
         return nextIndex;
     }
 
-    RouteManager(ArrayList<Point> route)
+    RouteManager(ArrayList<Point> route,HashMap<String, String> attributes, int fid)
     {
         currentRouteUTM = new ArrayList<Point>();
         currentRoute  = new ArrayList<Point>();
@@ -86,17 +91,19 @@ public class RouteManager {
         currentBearing = 0;
         currentDistance = 0;
         needsUpdate = TRUE;
+        this.attributes = attributes;
+        this.fid = fid;
 
     }
 
-    double pointToPointDistance(Point a, Point b)
+    private double pointToPointDistance(Point a, Point b)
     {
         double dx = a.getX() - b.getX();
         double dy = a.getY() - b.getY();
         return Math.sqrt(dx*dx + dy*dy);
     }
 
-    double pointToSegmentDistance(Point a, Point p1, Point p2)
+    private double pointToSegmentDistance(Point a, Point p1, Point p2)
     {
         double x21 = p2.getX() - p1.getX();
         double x01 = a.getX() - p1.getX();
@@ -121,8 +128,8 @@ public class RouteManager {
 
     /**
      *
-     * @return  The position (in geographic coordinates) of the nearest point on the line from
-     *          the current position
+     * Calculates the position (in geographic coordinates) of the nearest point on the line from
+     * the current position
      */
     private void calculateNearestLinePointGeo()
     {

@@ -24,6 +24,10 @@ public class PointFeature {
     // utm coords
     private UTM utmCoordinates;
 
+    public int getFid() {
+        return fid;
+    }
+
     // Feature ID
     private int fid;
     //attributes (key/value pairs, stored as a dictionary)
@@ -104,15 +108,17 @@ public class PointFeature {
     public double getBearing(double latitude, double longitude, double elevation)
     {
         double bearing = 0;
-
         Point pta = new Point(longitude,latitude);
         Point ptb = new Point(geoCoordinates.getLongitude(),geoCoordinates.getLatitude());
         bearing = GreatCircle.getBearing(pta,ptb);
-        //String result = String.format("(this: %f,%f) getBearing(%f,%f,%f) : returns %f\n",
-        //        geoCoordinates.getLatitude(),geoCoordinates.getLongitude(),latitude,longitude,elevation,bearing);
-
-        //Log.d("ARNAV", result);
 
         return bearing;
+    }
+
+    public double getDistance(double latitude, double longitude, double elevation)
+    {
+        Point pta = new Point(longitude,latitude);
+        Point ptb = new Point(geoCoordinates.getLongitude(),geoCoordinates.getLatitude());
+        return GreatCircle.getDistanceMeters(pta,ptb);
     }
 }
