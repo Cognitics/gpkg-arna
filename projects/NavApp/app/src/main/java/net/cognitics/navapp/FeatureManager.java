@@ -30,6 +30,10 @@ import static java.lang.Boolean.TRUE;
 
 public class FeatureManager {
 
+    public ArrayList<PointFeature> getCnpFeatures() {
+        return cnpFeatures;
+    }
+
     public ArrayList<PointFeature> cnpFeatures;
     public ArrayList<PointFeature> poiPointFeatures;
     public ArrayList<PointFeature> aoiPointFeatures;
