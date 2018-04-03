@@ -7,6 +7,7 @@ import java.util.Map;
 import mil.nga.wkb.geom.Point;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.util.Log;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -37,7 +38,7 @@ public class PointFeature {
     PointFeature(WGS84 geoCoordinates, int fid)
     {
         this.fid = fid;
-        this.geoCoordinates = new WGS84(geoCoordinates.getLongitude(),geoCoordinates.getLatitude());
+        this.geoCoordinates = new WGS84(geoCoordinates.getLatitude(),geoCoordinates.getLongitude());
         // Project to UTM
         utmCoordinates = new UTM(geoCoordinates);
 
@@ -91,5 +92,27 @@ public class PointFeature {
     public void render(GL10 gl)
     {
 
+    }
+
+    /**
+     *  Returns the bearing from a specified point to this point feature
+     * @param latitude The latitude of the position to get the bearing from
+     * @param longitude
+     * @param elevation
+     * @return The bearing from the specified position to the point feature
+     */
+    public double getBearing(double latitude, double longitude, double elevation)
+    {
+        double bearing = 0;
+
+        Point pta = new Point(longitude,latitude);
+        Point ptb = new Point(geoCoordinates.getLongitude(),geoCoordinates.getLatitude());
+        bearing = GreatCircle.getBearing(pta,ptb);
+        //String result = String.format("(this: %f,%f) getBearing(%f,%f,%f) : returns %f\n",
+        //        geoCoordinates.getLatitude(),geoCoordinates.getLongitude(),latitude,longitude,elevation,bearing);
+
+        //Log.d("ARNAV", result);
+
+        return bearing;
     }
 }

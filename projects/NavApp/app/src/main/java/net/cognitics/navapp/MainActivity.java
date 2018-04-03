@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import mil.nga.geopackage.*;
 import mil.nga.wkb.geom.Point;
@@ -227,10 +228,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             tvHeading.setText(" "+(int)bearing);
 
+            customGraphics.clearPoints();
+            ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();
+            for(PointFeature pointFeature : cnpFeatures)
+            {
+                double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(),mViewModel.getGps().getElevation());
+                //todo: add different colors for cnp point to differentiate from the next route point
+                //todo: make them clickable?
+                //todo: When I enable the following line, the screen doesn't refresh on my phone
+                //customGraphics.addPoint(cameraPreview, (float) b, 90);
+            }
             RouteManager rm = mViewModel.getRouteManager();
             if(rm!=null) {
                 rm.setCurrentPositionAndBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation(), bearing);
-                customGraphics.clearPoints();
+
                 double b = rm.getNearestBearing();
                 double d = rm.getNearestDistance();
                 int idx = rm.getNextIndex();

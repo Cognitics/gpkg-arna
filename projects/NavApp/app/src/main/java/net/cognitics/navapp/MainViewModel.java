@@ -23,7 +23,12 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     private GPSTracker gps;
-    FeatureManager featureManager;
+
+    public FeatureManager getFeatureManager() {
+        return featureManager;
+    }
+
+    private FeatureManager featureManager;
 
     public void setMessageLog(String messageLog) {
         this.messageLog = messageLog;
