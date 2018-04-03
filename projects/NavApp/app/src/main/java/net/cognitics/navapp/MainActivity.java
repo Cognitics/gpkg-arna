@@ -1,6 +1,8 @@
 package net.cognitics.navapp;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 
@@ -62,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     int resumeCamera=0;
     static final float ALPHA = 0.05f;
 
+    private Button btn;
+
     //
 
     public MainActivity() {
@@ -106,18 +111,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         customGraphics = new CustomGraphics(this);
 
-        //
+        final Intent intent = new Intent(this, TableDialogActivity.class);
+        btn = (Button) findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(intent, 1);
+            }
+        });
 
 
-        //TEST POINT
-        //customGraphics.addPoint(cameraPreview,0,90);
-        //customGraphics.addPoint(cameraPreview,90,90);
-        //customGraphics.addPoint(cameraPreview,180,90);
-        //customGraphics.addPoint(cameraPreview,270,90);
-        //customGraphics.addPoint(cameraPreview,40,50);
 
+    }
 
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            String rowText = data.getStringExtra(TableDialogActivity.RESULT_TEXT);
+            Toast.makeText(this, "You selected text: " + rowText, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
