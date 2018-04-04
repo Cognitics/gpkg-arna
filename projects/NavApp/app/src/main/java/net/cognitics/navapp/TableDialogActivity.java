@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.List;
 public class TableDialogActivity extends ListActivity {
 
     public static String RESULT_TEXT = "text";
+    public static String TITLE_TEXT = "title";
+    public static String ROW_STRINGS = "row_string_array";
 
     private List<Row> rows;
 
@@ -26,8 +29,17 @@ public class TableDialogActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rows.add(new Row("test 1"));
-        rows.add(new Row("test 2"));
+        setContentView(R.layout.activity_table_dialog);
+
+        Intent intent = getIntent();
+        String titleText = intent.getStringExtra(this.TITLE_TEXT);
+        TextView textView = findViewById(R.id.titleText);
+        textView.setText(titleText);
+        ArrayList<String> rowStrings = intent.getStringArrayListExtra(this.ROW_STRINGS);
+        for(String rowString : rowStrings)
+        {
+            rows.add(new Row(rowString));
+        }
         ArrayAdapter<Row> adapter = new TableDialogAdapter(this, rows);
         setListAdapter(adapter);
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -1,15 +1,18 @@
 package net.cognitics.navapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageManager;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -47,30 +50,33 @@ public class FeatureManager {
 
     public ArrayList<PointFeature> aoiPointFeatures;
     public ArrayList<LineStringFeature> routeFeatures;
-    private GeoPackage gpkgDb;
+    private GeoPackage geopackage;
+    private GeoPackageDatabase gpkgDb;
+    private SQLiteDatabase sqliteDb;
     private GeoPackageManager manager;
     private Point geoCenter;
+    private Context context;
+
 
     public RouteManager getRouteManager() {
         return routeManager;
     }
 
     private RouteManager routeManager;
-    public FeatureManager(Context context)
-    {
 
+    public FeatureManager(Context context) {
+        this.context = context;
         cnpFeatures = new ArrayList<PointFeature>();
         poiPointFeatures = new ArrayList<PointFeature>();
         aoiPointFeatures = new ArrayList<PointFeature>();
         routeFeatures = new ArrayList<LineStringFeature>();
-        gpkgDb = null;
+        geopackage = null;
         manager = GeoPackageFactory.getManager(context);
         geoCenter = new Point();
         routeManager = null;
     }
 
-    private void processRoute(LineString ls, String table,HashMap<String, String> attributes,int fid)
-    {
+    private void processRoute(LineString ls, String table, HashMap<String, String> attributes, int fid) {
         int numVerts = 0;
         double totalX = 0;
         double totalY = 0;
@@ -82,30 +88,61 @@ public class FeatureManager {
             numVerts++;
         }
         if (table.startsWith("route_")) {
-            routeManager = new RouteManager(routePoints,attributes,fid);
+            routeManager = new RouteManager(routePoints, attributes, fid);
         }
         geoCenter.setX(totalX / numVerts);
         geoCenter.setY(totalY / numVerts);
     }
 
+    public ArrayList<String> getRoutes() {
+        ArrayList<String> tables = new ArrayList<String>();
+        if (geopackage != null) {
+            SQLiteDatabase sqliteDb = gpkgDb.getDb();
 
-    public Boolean open(String fileName) {
-        File f = new File(fileName);
-        String geoPackageName = f.getName();
-        // Open a GeoPackage
-        if (!manager.exists(geoPackageName)) {
-            manager.importGeoPackage(geoPackageName, f);
+            Cursor cursor = sqliteDb.rawQuery("select * from gpkg_contents where table_name like 'route_%'", null);
+            try {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    int idx = cursor.getColumnIndex("table_name");
+                    tables.add(cursor.getString(idx));
+                    cursor.moveToNext();
+                }
+            } finally {
+                cursor.close();
+            }
+
         }
-        gpkgDb = manager.open(geoPackageName);
-        if (gpkgDb != null) {
+        return tables;
+    }
+
+    public Boolean initializeRoute(String route) {
+        if (geopackage != null) {
+            gpkgDb = geopackage.getConnection().getDb();
             int numVerts = 0;
             double totalY = 0;
             double totalX = 0;
 
-            List<String> tables = gpkgDb.getFeatureTables();
+            // clear old route features
+            aoiPointFeatures.clear();
+            cnpFeatures.clear();
+            routeFeatures.clear();
+            poiPointFeatures.clear();
+
+            List<String> tables = geopackage.getFeatureTables();
+
 
             for (String table : tables) {
-                FeatureDao featureDao = gpkgDb.getFeatureDao(table);
+                // Only load tables matching the route name (E.g. aoi_xxx where xxx is the route name)
+                int offset = table.length() - route.length();
+                if (offset < 1) {
+                    continue;
+                }
+                String tableRouteName = table.substring(offset);
+                if (!tableRouteName.equalsIgnoreCase(route))
+                    continue;
+
+                //if(table.substring())
+                FeatureDao featureDao = geopackage.getFeatureDao(table);
 
                 FeatureCursor featureCursor = featureDao.queryForAll();
                 int numFeatures = featureCursor.getCount();
@@ -122,13 +159,12 @@ public class FeatureManager {
 
                                 String attrName = featureRow.getColumn(colName).getName();
                                 Object attrValue = featureRow.getValue(colName);
-                                if(attrValue!=null)
+                                if (attrValue != null)
                                     attributes.put(attrName, attrValue.toString());
-                                if(colName.equalsIgnoreCase("fid"))
-                                {
+                                if (colName.equalsIgnoreCase("fid")) {
                                     // Weird double conversion here to make sure the
                                     // fid is parsed no matter what it's type
-                                    if(attrValue!=null)
+                                    if (attrValue != null)
                                         fid = Integer.valueOf(attrValue.toString());
                                 }
                             }
@@ -138,14 +174,13 @@ public class FeatureManager {
                         GeoPackageGeometryData geometryData = featureRow.getGeometry();
                         Geometry geometry = geometryData.getGeometry();
                         if (geometry instanceof LineString) {
-                            LineString line = (LineString)geometry;
-                            processRoute(line,table,attributes,fid);
+                            LineString line = (LineString) geometry;
+                            processRoute(line, table, attributes, fid);
 
-                        } else if(geometry instanceof MultiLineString) {
-                            MultiLineString mls = (MultiLineString)geometry;
-                            for(LineString line: mls.getGeometries())
-                            {
-                                processRoute(line,table,attributes,fid);
+                        } else if (geometry instanceof MultiLineString) {
+                            MultiLineString mls = (MultiLineString) geometry;
+                            for (LineString line : mls.getGeometries()) {
+                                processRoute(line, table, attributes, fid);
                             }
 
                         } else if (geometry instanceof Point) {
@@ -162,10 +197,9 @@ public class FeatureManager {
                             totalX += pt.getX();
                             totalY += pt.getY();
                             numVerts++;
-                        } else if (geometry instanceof  MultiPoint)
-                        {
-                          MultiPoint mp = (MultiPoint)geometry;
-                          for(Point pt : mp.getGeometries()) {
+                        } else if (geometry instanceof MultiPoint) {
+                            MultiPoint mp = (MultiPoint) geometry;
+                            for (Point pt : mp.getGeometries()) {
                                 PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid);
                                 feature.setAttributes(attributes);
                                 if (table.startsWith("cnp_")) {
@@ -199,6 +233,22 @@ public class FeatureManager {
 
         } else {
             return FALSE;
+        }
+        return FALSE;
+    }
+
+    public Boolean open(String fileName) {
+        File f = new File(fileName);
+        String geoPackageName = f.getName();
+        // Open a GeoPackage
+        if (!manager.exists(geoPackageName)) {
+            manager.importGeoPackage(geoPackageName, f);
+        }
+        geopackage = manager.open(geoPackageName);
+        if(geopackage!=null) {
+            gpkgDb = geopackage.getConnection().getDb();
+            sqliteDb = gpkgDb.getDb();
+            return TRUE;
         }
         return FALSE;
     }

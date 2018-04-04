@@ -26,17 +26,12 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 
-import mil.nga.geopackage.*;
-import mil.nga.wkb.geom.Point;
-
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 
 
-
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 
@@ -64,10 +59,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float Rot[] = new float[9];
     int resumeCamera=0;
     static final float ALPHA = 0.05f;
-
-    private Button btn;
-
-    //
 
     public MainActivity() {
         //NULL
@@ -111,16 +102,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         customGraphics = new CustomGraphics(this);
 
-        final Intent intent = new Intent(this, TableDialogActivity.class);
-        btn = (Button) findViewById(R.id.button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(intent, 1);
-            }
-        });
-
-
 
     }
 
@@ -129,7 +110,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             String rowText = data.getStringExtra(TableDialogActivity.RESULT_TEXT);
-            Toast.makeText(this, "You selected text: " + rowText, Toast.LENGTH_LONG).show();
+            String routePrefix = "route_";
+            if(rowText.startsWith(routePrefix))
+            {
+                String routeName =  rowText.substring(routePrefix.length());
+                Toast.makeText(this, "You selected route: " + routeName, Toast.LENGTH_LONG).show();
+                mViewModel.initializeRoute(routeName);
+            }
+            else
+            {
+                Toast.makeText(this, "Invalid Route: " + rowText, Toast.LENGTH_LONG).show();
+            }
+
         }
     }
 
@@ -184,6 +176,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private Boolean openGeoPackage(String path) {
         mViewModel.openGeoPackage(path);
+        ArrayList<String> tables = mViewModel.getFeatureManager().getRoutes();
+        if(tables.size()>1) {
+            // Popup a list of tables
+            // we will find all of the tables starting with route_ and
+            // present the user with the choice of which route to use
+            final Intent intent = new Intent(this, TableDialogActivity.class);
+            intent.putExtra(TableDialogActivity.TITLE_TEXT, "Select Route");
+            ArrayList<String> tableRows = new ArrayList<String>(tables);
+            intent.putExtra(TableDialogActivity.ROW_STRINGS, tableRows);
+            startActivityForResult(intent, 1);
+        }
         return TRUE;
     }
     @Override
