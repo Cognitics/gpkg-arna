@@ -53,7 +53,7 @@ public class LineStringFeature {
             UTM utm = new UTM(geo);
             Point utmPoint = new Point();
             utmPoint.setX(utm.getEasting());
-            utmPoint.setX(utm.getNorthing());
+            utmPoint.setY(utm.getNorthing());
             utmPoint.setZ(pt.getZ());
             utmLine.addPoint(utmPoint);
         }

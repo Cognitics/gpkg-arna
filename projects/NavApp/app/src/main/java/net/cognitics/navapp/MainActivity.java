@@ -1,6 +1,8 @@
 package net.cognitics.navapp;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 
@@ -21,9 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-
-import mil.nga.geopackage.*;
-import mil.nga.wkb.geom.Point;
+import java.util.ArrayList;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -31,8 +32,6 @@ import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 
 
-
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 
@@ -41,11 +40,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     Camera camera;
     FrameLayout cameraPreview;
     ShowCamera showCamera;
-    FeatureManager featureManager;
     PermissionManager permissionManager;
-
-    private GeoPackage gpkgDb;
-    private GPSTracker gps;
 
     MainViewModel mViewModel;
 
@@ -63,9 +58,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float I[] = new float[9];
     private float Rot[] = new float[9];
     int resumeCamera=0;
-    static final float ALPHA = 0.25f;
-
-    //
+    static final float ALPHA = 0.05f;
 
     public MainActivity() {
         //NULL
@@ -109,18 +102,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         customGraphics = new CustomGraphics(this);
 
-        //
 
+    }
 
-        //TEST POINT
-        customGraphics.addPoint(cameraPreview,0,90);
-        customGraphics.addPoint(cameraPreview,90,90);
-        customGraphics.addPoint(cameraPreview,180,90);
-        customGraphics.addPoint(cameraPreview,270,90);
-        customGraphics.addPoint(cameraPreview,40,50);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            String rowText = data.getStringExtra(TableDialogActivity.RESULT_TEXT);
+            String routePrefix = "route_";
+            if(rowText.startsWith(routePrefix))
+            {
+                String routeName =  rowText.substring(routePrefix.length());
+                Toast.makeText(this, "You selected route: " + routeName, Toast.LENGTH_LONG).show();
+                mViewModel.initializeRoute(routeName);
+            }
+            else
+            {
+                Toast.makeText(this, "Invalid Route: " + rowText, Toast.LENGTH_LONG).show();
+            }
 
-
-
+        }
     }
 
     @Override
@@ -174,6 +176,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private Boolean openGeoPackage(String path) {
         mViewModel.openGeoPackage(path);
+        ArrayList<String> tables = mViewModel.getFeatureManager().getRoutes();
+        if(tables.size()>1) {
+            // Popup a list of tables
+            // we will find all of the tables starting with route_ and
+            // present the user with the choice of which route to use
+            final Intent intent = new Intent(this, TableDialogActivity.class);
+            intent.putExtra(TableDialogActivity.TITLE_TEXT, "Select Route");
+            ArrayList<String> tableRows = new ArrayList<String>(tables);
+            intent.putExtra(TableDialogActivity.ROW_STRINGS, tableRows);
+            startActivityForResult(intent, 1);
+        }
         return TRUE;
     }
     @Override
@@ -220,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             pitch = (float)(((results[1] * 180 / Math.PI)) + 90);
             roll = (float)(((results[2] * 180 / Math.PI)));
             customGraphics.setViewModel(bearing,pitch);
-            customGraphics.updatePositions();
+
 
             //hotfix for camera being upside down in reverse landscape mode
             showCamera.updateRoll((int)roll);
@@ -230,6 +243,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 resumeCamera=0;
             }
             tvHeading.setText(" "+(int)bearing);
+
+            //customGraphics.clearPoints();
+            ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();
+            for(PointFeature pointFeature : cnpFeatures)
+            {
+                double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(),mViewModel.getGps().getElevation());
+                //todo: add different colors for cnp point to differentiate from the next route point
+                //todo: make them clickable?
+                //todo: When I enable the following line, the screen doesn't refresh on my phone
+                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()));
+            }
+            RouteManager rm = mViewModel.getRouteManager();
+            if(rm!=null) {
+                rm.setCurrentPositionAndBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation(), bearing);
+
+                double b = rm.getNearestBearing();
+                double d = rm.getNearestDistance();
+                int idx = rm.getNextIndex();
+                mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d",d/1000.0,b,idx));
+                TextView msgText = (TextView) findViewById(R.id.messages);
+                msgText.setText(mViewModel.messageLog);
+                customGraphics.addPoint(cameraPreview, (float) b, 90,"route_point");
+                customGraphics.updatePositions();
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.wkb.geom.Point;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 /**
@@ -17,8 +18,23 @@ import static java.lang.Boolean.TRUE;
 public class MainViewModel extends AndroidViewModel {
 
     private GeoPackage gpkgDb;
+
+    public GPSTracker getGps() {
+        return gps;
+    }
+
     private GPSTracker gps;
-    FeatureManager featureManager;
+
+    public FeatureManager getFeatureManager() {
+        return featureManager;
+    }
+
+    private FeatureManager featureManager;
+
+    public void setMessageLog(String messageLog) {
+        this.messageLog = messageLog;
+    }
+
     public String messageLog = new String();
 
     public MainViewModel(@NonNull Application application) {
@@ -27,18 +43,14 @@ public class MainViewModel extends AndroidViewModel {
         gps = new GPSTracker(application.getApplicationContext());
     }
 
-    public Boolean openGeoPackage(String path) {
-        featureManager.open(path);
-        //Point geoPackageCenter = featureManager.getGeoCenter();
-
+    public Boolean initializeRoute(String route)
+    {
+        //todo: initialize route in feature manager
+        if(!featureManager.initializeRoute(route))
+        {
+            return FALSE;
+        }
         StringBuilder messageBuilder = new StringBuilder();
-        /*
-                message.append("Center = ");
-                message.append(geoPackageCenter.getY());
-                message.append(", ");
-                message.append(geoPackageCenter.getX());
-                message.append("\n");
-        */
         messageBuilder.append("Routes points: ");
         messageBuilder.append(featureManager.getRouteManager().getRoute().size());
         messageBuilder.append("\nCNPs: ");
@@ -71,9 +83,16 @@ public class MainViewModel extends AndroidViewModel {
             messageBuilder.append("Bearing: " + Double.valueOf(bearing).toString() + "\n");
         }
         messageLog = messageBuilder.toString();
-
-
         return TRUE;
     }
 
+    public Boolean openGeoPackage(String path) {
+        return featureManager.open(path);
+
+    }
+
+    RouteManager getRouteManager()
+    {
+        return featureManager.getRouteManager();
+    }
 }
