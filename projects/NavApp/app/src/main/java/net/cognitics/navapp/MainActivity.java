@@ -32,6 +32,7 @@ import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 
@@ -105,22 +106,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    /**
+     * Verify the table name starts with route, and initialize it if it does
+     * @param tableName a table name beginning with "route_"
+     * @return
+     */
+    public Boolean parseAndInitializeRoute(String tableName)
+    {
+        String routePrefix = "route_";
+        if(tableName.startsWith(routePrefix))
+        {
+            String routeName =  tableName.substring(routePrefix.length());
+            Toast.makeText(this, "You selected route: " + routeName, Toast.LENGTH_LONG).show();
+            return mViewModel.initializeRoute(routeName);
+
+        }
+        else
+        {
+            Toast.makeText(this, "Invalid Route: " + tableName, Toast.LENGTH_LONG).show();
+            return FALSE;
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             String rowText = data.getStringExtra(TableDialogActivity.RESULT_TEXT);
-            String routePrefix = "route_";
-            if(rowText.startsWith(routePrefix))
-            {
-                String routeName =  rowText.substring(routePrefix.length());
-                Toast.makeText(this, "You selected route: " + routeName, Toast.LENGTH_LONG).show();
-                mViewModel.initializeRoute(routeName);
-            }
-            else
-            {
-                Toast.makeText(this, "Invalid Route: " + rowText, Toast.LENGTH_LONG).show();
-            }
+            parseAndInitializeRoute(rowText);
 
         }
     }
@@ -187,6 +200,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             intent.putExtra(TableDialogActivity.ROW_STRINGS, tableRows);
             startActivityForResult(intent, 1);
         }
+        else if(tables.size()==1)
+        {
+            parseAndInitializeRoute(tables.get(00));
+        }
+        else
+            return FALSE;
         return TRUE;
     }
     @Override
