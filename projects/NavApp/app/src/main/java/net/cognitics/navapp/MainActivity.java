@@ -242,6 +242,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
        // showCamera = new ShowCamera(this, camera);
         //cameraPreview.addView(showCamera);
         resumeCamera=1;
+        if(mSensorManager==null)
+            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
@@ -256,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
         // to stop the listener and save battery
+        if(mSensorManager==null)
+            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensorManager.unregisterListener(this);
     }
 
