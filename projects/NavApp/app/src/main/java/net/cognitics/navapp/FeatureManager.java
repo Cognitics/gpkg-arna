@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,21 +44,26 @@ public class FeatureManager {
 
     public ArrayList<PointFeature> cnpFeatures;
     public ArrayList<PointFeature> poiPointFeatures;
-
-    public ArrayList<PointFeature> getAoiPointFeatures() {
-        return aoiPointFeatures;
-    }
-
     public ArrayList<PointFeature> aoiPointFeatures;
     public ArrayList<LineStringFeature> routeFeatures;
+
+    public ArrayList<RelatedTablesRelationship> cnpRelationships;
+    public ArrayList<RelatedTablesRelationship> poiRelationships;
+    public ArrayList<RelatedTablesRelationship> aoiRelationships;
+    public ArrayList<RelatedTablesRelationship> routeRelationships;
+
     private GeoPackage geopackage;
     private GeoPackageDatabase gpkgDb;
     private SQLiteDatabase sqliteDb;
     private GeoPackageManager manager;
     private Point geoCenter;
     private Context context;
+    private GeoPackageRelatedTables relatedTablesManager;
 
 
+    public ArrayList<PointFeature> getAoiPointFeatures() {
+        return aoiPointFeatures;
+    }
     public RouteManager getRouteManager() {
         return routeManager;
     }
@@ -127,6 +133,10 @@ public class FeatureManager {
             cnpFeatures.clear();
             routeFeatures.clear();
             poiPointFeatures.clear();
+            cnpRelationships = new ArrayList<>();
+            poiRelationships = new ArrayList<>();
+            aoiRelationships = new ArrayList<>();
+            routeRelationships = new ArrayList<>();
 
             List<String> tables = geopackage.getFeatureTables();
 
@@ -141,11 +151,36 @@ public class FeatureManager {
                 if (!tableRouteName.equalsIgnoreCase(route))
                     continue;
 
-                //if(table.substring())
+                if (table.startsWith("cnp_")) {
+                    cnpRelationships = relatedTablesManager.getRelationships(table);
+                    if(cnpRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", cnpRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                } else if (table.startsWith("poi_")) {
+                    poiRelationships = relatedTablesManager.getRelationships(table);
+                    if(poiRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", poiRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                } else if (table.startsWith("aoi_")) {
+                    aoiRelationships = relatedTablesManager.getRelationships(table);
+                    if(aoiRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", aoiRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                } else if (table.startsWith("route_")) {
+                    routeRelationships = relatedTablesManager.getRelationships(table);
+                    if(routeRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", routeRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                }
+
                 FeatureDao featureDao = geopackage.getFeatureDao(table);
 
                 FeatureCursor featureCursor = featureDao.queryForAll();
-                int numFeatures = featureCursor.getCount();
+                //int numFeatures = featureCursor.getCount();
 
                 try {
                     while (featureCursor.moveToNext()) {
@@ -248,6 +283,7 @@ public class FeatureManager {
         if(geopackage!=null) {
             gpkgDb = geopackage.getConnection().getDb();
             sqliteDb = gpkgDb.getDb();
+            relatedTablesManager = new GeoPackageRelatedTables(geopackage);
             return TRUE;
         }
         return FALSE;

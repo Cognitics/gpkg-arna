@@ -37,17 +37,7 @@ import static java.lang.Boolean.TRUE;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // On some devices the camera preview is lost when the activity is
-        // restarted (i.e. onStart() is called but not onCreate())
-        // Get camera stuff
-        camera = Camera.open();
-        cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
-        showCamera = new ShowCamera(this, camera);
-        cameraPreview.addView(showCamera);
-    }
+
 
     Camera camera;
     FrameLayout cameraPreview;
@@ -55,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     PermissionManager permissionManager;
 
     MainViewModel mViewModel;
-
 
     //Sensor Variables
     TextView tvHeading;
@@ -71,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float Rot[] = new float[9];
     int resumeCamera=0;
     static final float ALPHA = 0.05f;
+
+    static final int ROUTE_SELECT_REQUEST = 1;
 
     public MainActivity() {
         //NULL
@@ -210,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             intent.putExtra(TableDialogActivity.TITLE_TEXT, "Select Route");
             ArrayList<String> tableRows = new ArrayList<String>(tables);
             intent.putExtra(TableDialogActivity.ROW_STRINGS, tableRows);
-            startActivityForResult(intent, 1);
+            startActivityForResult(intent, ROUTE_SELECT_REQUEST);
         }
         else if(tables.size()==1)
         {
@@ -313,5 +304,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // On some devices the camera preview is lost when the activity is
+        // restarted (i.e. onStart() is called but not onCreate())
+        // Get camera stuff
+        camera = Camera.open();
+        cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
+        showCamera = new ShowCamera(this, camera);
+        cameraPreview.addView(showCamera);
     }
 }
