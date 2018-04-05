@@ -37,6 +37,17 @@ import static java.lang.Boolean.TRUE;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // On some devices the camera preview is lost when the activity is
+        // restarted (i.e. onStart() is called but not onCreate())
+        // Get camera stuff
+        camera = Camera.open();
+        cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
+        showCamera = new ShowCamera(this, camera);
+        cameraPreview.addView(showCamera);
+    }
 
     Camera camera;
     FrameLayout cameraPreview;
@@ -102,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //ADD TO mViewModel
 
         customGraphics = new CustomGraphics(this);
+        //Toast.makeText(this, "onCreate()", Toast.LENGTH_LONG).show();
 
 
     }
