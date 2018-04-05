@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.cognitics.navapp.TableDialogActivity">
+    tools:context="net.cognitics.navapp.RelatedTablesImageDialog">
 
     <TextView
         android:id="@+id/titleText"
@@ -30,8 +30,17 @@
         android:layout_marginTop="8dp"
         android:background="#aaaaaa"
         android:scrollIndicators="right"
+        android:scrollY="?android:attr/scrollbarSize"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
         app:layout_constraintTop_toBottomOf="@+id/titleText"
         tools:layout_editor_absoluteX="0dp" />
 
-
+    <!--<TextView
+        android:id="@id/android:empty"
+        android:layout_width="fill_parent"
+        android:layout_height="509dp"
+        android:layout_marginTop="8dp"
+        android:background="#FFffff"
+        android:text="No data"
+        app:layout_constraintTop_toBottomOf="@+id/titleText" /> -->
 </android.support.constraint.ConstraintLayout>

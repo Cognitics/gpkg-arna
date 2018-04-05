@@ -17,6 +17,11 @@ import static java.lang.Boolean.TRUE;
 
 public class MainViewModel extends AndroidViewModel {
 
+    public Boolean haveCameraPermission = FALSE;
+    public Boolean haveLocationPermission = FALSE;
+    public Boolean haveReadMediaPermission = FALSE;
+    public Boolean haveWriteMediaPermission = TRUE;//enabled for now, not sure if we need this permission
+
     private GeoPackage gpkgDb;
 
     public GPSTracker getGps() {
