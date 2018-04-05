@@ -1,8 +1,10 @@
 package net.cognitics.navapp;
 
+import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,13 +12,17 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v13.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
 
 import com.karan.churi.PermissionManager.PermissionManager;
+import com.karan.churi.PermissionManager.PermissionManager.statusArray;
 
 import android.view.View;
 import android.support.v7.app.AlertDialog;
@@ -63,28 +69,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     static final int ROUTE_SELECT_REQUEST = 1;
 
+    static final int REQUEST_CAMERA = 1;
+    static final int REQUEST_LOCATION = 2;
+    static final int REQUEST_MEDIA_WRITE = 3;
+    static final int REQUEST_MEDIA_READ = 4;
+
+    Boolean haveCameraPermission = FALSE;
+    Boolean haveLocationPermission = FALSE;
+    Boolean haveReadMediaPermission = FALSE;
+    Boolean haveWriteMediaPermission = TRUE;//enabled for now, not sure if we need this permission
+
     public MainActivity() {
         //NULL
     }
 
-    /*
-     * Runs on app launch
+    /**
+     * Called from onCreate() when the proper permissions exist
      */
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        // Basic app creation
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        TextView msgText = (TextView) findViewById(R.id.messages);
-        msgText.setText(mViewModel.messageLog);
-        if (savedInstanceState == null) {
-            // Ask for runtime permission
-            permissionManager = new PermissionManager() {};
-            permissionManager.checkAndRequestPermissions(this);
-         }
+    protected void onCreateWithPermissions()
+    {
         // Get camera stuff
         camera = Camera.open();
         cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
@@ -101,11 +104,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
-        //ADD TO mViewModel
-
         customGraphics = new CustomGraphics(this);
         //Toast.makeText(this, "onCreate()", Toast.LENGTH_LONG).show();
+    }
 
+    /*
+     * Runs on app launch
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        // Basic app creation
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        TextView msgText = (TextView) findViewById(R.id.messages);
+        msgText.setText(mViewModel.messageLog);
+
+        if (savedInstanceState == null) {
+            // Ask for runtime permission
+            permissionManager = new PermissionManager() {};
+            permissionManager.checkAndRequestPermissions(this);
+        }
+        makeRequest();
+
+        if(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission) {
+            // Initialize the app
+            onCreateWithPermissions();
+        }
 
     }
 
@@ -141,16 +167,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        permissionManager.checkResult(requestCode, permissions, grantResults);
-    }
 
     /*
      * Functionality for choosing gpkg from files
      * @param v View
      */
     public void onClick(View v) {
+        if(!(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission)) {
+            return;
+        }
         DialogProperties properties = new DialogProperties();
         properties.selection_mode = DialogConfigs.SINGLE_MODE;
         properties.selection_type = DialogConfigs.FILE_SELECT;
@@ -214,7 +239,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
-
+        if(!(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission)) {
+            return;
+        }
         //camera = Camera.open();
         ///cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
        // showCamera = new ShowCamera(this, camera);
@@ -230,6 +257,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
+        if(!(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission)) {
+            return;
+        }
         // to stop the listener and save battery
         mSensorManager.unregisterListener(this);
     }
@@ -237,6 +267,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent evt) {
+        if(!(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission)) {
+            return;
+        }
         if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             gravSensorVals = lowPass(evt.values.clone(), gravSensorVals);
         } else if (evt.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
@@ -309,6 +342,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onStart() {
         super.onStart();
+        if(!(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission)) {
+            return;
+        }
         // On some devices the camera preview is lost when the activity is
         // restarted (i.e. onStart() is called but not onCreate())
         // Get camera stuff
@@ -317,4 +353,58 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         showCamera = new ShowCamera(this, camera);
         cameraPreview.addView(showCamera);
     }
+
+    /**
+     * Request permissions
+     * take pictures and video
+     * location
+     * access photos and media
+     */
+    protected void makeRequest() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},REQUEST_CAMERA);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_MEDIA_READ);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_MEDIA_WRITE);
+
+
+        //makeRequest()
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[]
+                                                   grantResults) {
+
+        permissionManager.checkResult(requestCode, permissions, grantResults);
+        ArrayList<statusArray> sa = permissionManager.getStatus();
+        //System.out.println("xx" + sa.size());
+        for(String permission : sa.get(0).granted) {
+            switch(permission) {
+                case "android.permission.CAMERA":
+                    haveCameraPermission = TRUE;
+                    break;
+                case "android.permission.ACCESS_FINE_LOCATION":
+                    haveLocationPermission = TRUE;
+                    break;
+                case "android.permission.READ_EXTERNAL_STORAGE":
+                    haveReadMediaPermission = TRUE;
+                    break;
+                case "android.permission.WRITE_EXTERNAL_STORAGE":
+                    haveWriteMediaPermission = TRUE;
+                    break;
+            }
+        }
+
+        if(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission) {
+            // Initialize the app
+            onCreateWithPermissions();
+        }
+    }
+
+
 }
