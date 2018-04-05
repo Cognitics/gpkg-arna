@@ -33,13 +33,19 @@ public class GeoPackageRelatedTables {
 
     public Boolean IsRelatedTablesInstalled()
     {
-        return TRUE; //the SOFWERX dataset doesn't have gpkg_extensions populated
-        /*
+
         Cursor cursor = sqliteDb.rawQuery("select * from gpkg_extensions WHERE extension_name='related_tables'",null);
         if(cursor.getCount()>0)
             return Boolean.TRUE;
+        else
+        {
+            cursor = sqliteDb.rawQuery("select * from sqlite_master WHERE name='gpkgext_relations'",null);
+            if(cursor.getCount()>0)
+                return Boolean.TRUE;
+
+        }
         return Boolean.FALSE;
-        */
+
     }
 
     ArrayList<RelatedTablesRelationship> getRelationships(String layer)
