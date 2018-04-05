@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -53,40 +54,53 @@ public class CustomGraphics extends View
     public void updatePositions(){
         int width = camera.getMeasuredWidth();
         int height = camera.getMeasuredHeight();
-             for (NavPoint n : navMap.values()){
+        for (NavPoint n : navMap.values()){
 
-                 //Set X and Y to center of screen
-                 int tX = (width/2)-(n.getWidth()/2);
-                 int tY = (height/2)-(n.getHeight()/2);
+            //Set X and Y to center of screen
+            int tX = (width/2)-(n.getWidth()/2);
+            int tY = (height/2)-(n.getHeight()/2);
+            TextView text = n.getText();
+            text.setVisibility(View.GONE);
+            text.measure(0, 0);
+            boolean showText = true;
+            //Offset X and Y based on deltaPitch and deltaBearing
+            if (Math.abs(n.getBearing()-bearing)>180){
+                tX += 12 * (bearing-(n.getBearing()));
+            }else {
+                tX += 12 * ((n.getBearing()) - (bearing));
+            }
+            tY-=16*(n.getPitch()-(pitch));
 
-                 //Offset X and Y based on deltaPitch and deltaBearing
-                 if (Math.abs(n.getBearing()-bearing)>180){
-                     tX += 12 * ((n.getBearing()) - (bearing-360));
-                 }else {
-                     tX += 12 * ((n.getBearing()) - (bearing));
-                 }
-                 tY-=16*(n.getPitch()-(pitch));
 
-                 //Keep on screen if out of screen
-                 if (tY<0){
-                     //CASE: Off screen up
-                     tY=0;
-                 }else if (tY>height-n.getHeight()){
-                     //CASE: Off screen down
-                     tY=height-(n.getHeight());
-                 }
-                 if (tX<0){
-                     //CASE: Off screen to left
-                     tX=0;
-                 }else if (tX>width-n.getWidth()){
-                     //CASE: Off screen to right
-                     tX=width-(n.getWidth());
-                 }
+            //Keep on screen if out of screen
+            if (tY<0){
+                //CASE: Off screen up
+                tY=0;
+                showText=false;
+            }else if (tY>height-n.getHeight()){
+                //CASE: Off screen down
+                tY=height-(n.getHeight());
+                showText=false;
+            }
+            if (tX<0){
+                //CASE: Off screen to left
+                tX=0;
+                showText=false;
+            }else if (tX>width-n.getWidth()){
+                //CASE: Off screen to right
+                tX=width-(n.getWidth());
+                showText=false;
+            }
 
-                 //Apply X and Y
-                 n.setX((float)tX);
-                 n.setY((float)tY);
-             }
+            //Apply X and Y
+            if (showText){
+                text.setVisibility(View.VISIBLE);
+                text.setX((float)tX-(text.getMeasuredWidth()/4));
+                text.setY((float)tY+70);
+            }
+            n.setX((float)tX);
+            n.setY((float)tY);
+        }
 
     }
 
@@ -114,6 +128,8 @@ public class CustomGraphics extends View
 
         navMap.put(id,newPoint);
         camera.addView(newPoint);
+        camera.addView(newPoint.getText());
+        newPoint.getText().setText(" Waypoint X \n\t500m");
     }
 
     public void updatePoint(float bearing, float pitch, String id)

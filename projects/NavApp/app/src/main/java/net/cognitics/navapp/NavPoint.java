@@ -2,21 +2,15 @@ package net.cognitics.navapp;
 
 import android.content.Context;
 import android.support.v7.widget.AppCompatImageButton;
+import android.widget.TextView;
 
 /**
  * Created by Chris on 3/16/2018.
  */
 
 public class NavPoint extends AppCompatImageButton{
-    public void setBearing(float bearing) {
-        this.bearing = bearing;
-    }
-
-    public void setPitch(float pitch) {
-        this.pitch = pitch;
-    }
-
     private float bearing,pitch;
+    private TextView textView;
 
     public NavPoint(Context context) {
         super(context);
@@ -27,10 +21,20 @@ public class NavPoint extends AppCompatImageButton{
         this.pitch=pitch;
         //setScaleX(.1f);
         //setScaleY(.1f);
+        textView = new TextView(context);
         setMinimumHeight(50);
         setMinimumWidth(50);
 
     }
+
+    public void setBearing(float bearing) {
+        this.bearing = bearing;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
 
     public float getBearing(){
         return bearing;
@@ -38,6 +42,7 @@ public class NavPoint extends AppCompatImageButton{
     public float getPitch(){
         return pitch;
     }
+    public TextView getText(){return textView;};
 
 
     @Override
@@ -50,4 +55,12 @@ public class NavPoint extends AppCompatImageButton{
         int min = Math.min(measuredHeight, measuredWidth);
         setMeasuredDimension(min/10, min/10);
     }
+
+
+
+
+
+
+
+
 }

@@ -37,6 +37,8 @@ public class MainViewModel extends AndroidViewModel {
 
     public String messageLog = new String();
 
+    private CustomGraphics customGraphics;
+
     public MainViewModel(@NonNull Application application) {
         super(application);
         featureManager = new FeatureManager(application.getApplicationContext());
@@ -90,6 +92,8 @@ public class MainViewModel extends AndroidViewModel {
         return featureManager.open(path);
 
     }
+    public CustomGraphics getCustomGraphics(){return customGraphics;}
+    public void setCustomGraphics(CustomGraphics customGraphics){this.customGraphics=customGraphics;}
 
     RouteManager getRouteManager()
     {

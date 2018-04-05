@@ -104,7 +104,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
-        customGraphics = new CustomGraphics(this);
+
+
         //Toast.makeText(this, "onCreate()", Toast.LENGTH_LONG).show();
     }
 
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if (savedInstanceState == null) {
             // Ask for runtime permission
+            mViewModel.setCustomGraphics(new CustomGraphics(this));
             permissionManager = new PermissionManager() {};
             permissionManager.checkAndRequestPermissions(this);
         }
@@ -267,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent evt) {
+        customGraphics=mViewModel.getCustomGraphics();
         if(!(haveReadMediaPermission && haveLocationPermission && haveReadMediaPermission && haveWriteMediaPermission)) {
             return;
         }
