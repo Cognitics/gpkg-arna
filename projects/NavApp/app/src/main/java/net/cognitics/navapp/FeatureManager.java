@@ -47,6 +47,26 @@ public class FeatureManager {
     public ArrayList<PointFeature> aoiPointFeatures;
     public ArrayList<LineStringFeature> routeFeatures;
 
+    public ArrayList<RelatedTablesRelationship> getCnpRelationships() {
+        return cnpRelationships;
+    }
+
+    public ArrayList<RelatedTablesRelationship> getPoiRelationships() {
+        return poiRelationships;
+    }
+
+    public ArrayList<RelatedTablesRelationship> getAoiRelationships() {
+        return aoiRelationships;
+    }
+
+    public ArrayList<RelatedTablesRelationship> getRouteRelationships() {
+        return routeRelationships;
+    }
+
+    public GeoPackageRelatedTables getRelatedTablesManager() {
+        return relatedTablesManager;
+    }
+
     public ArrayList<RelatedTablesRelationship> cnpRelationships;
     public ArrayList<RelatedTablesRelationship> poiRelationships;
     public ArrayList<RelatedTablesRelationship> aoiRelationships;
@@ -59,7 +79,7 @@ public class FeatureManager {
     private Point geoCenter;
     private Context context;
     private GeoPackageRelatedTables relatedTablesManager;
-
+    private final int CNP_TEST_REQUEST = 1;
 
     public ArrayList<PointFeature> getAoiPointFeatures() {
         return aoiPointFeatures;
@@ -291,5 +311,59 @@ public class FeatureManager {
 
     public Point getGeoCenter() {
         return geoCenter;
+    }
+
+    public ArrayList<RelatedTablesImageDialog.Row> relatedFeaturesTest() {
+        ArrayList<RelatedTablesImageDialog.Row> rows = new ArrayList<>();
+        // For now, just show relationships for the first type of relationship there is.
+        if (cnpRelationships.size() > 0) {
+            RelatedTablesRelationship relationship = cnpRelationships.get(0);
+
+            GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
+
+
+            for (PointFeature pt : cnpFeatures) {
+                //ArrayList<Integer> fids = gpkgRTE.getRelatedFIDs(relationship, pt.getFid());
+                // Query for the data the hard way. It would be cleaner and probably faster
+                // to do a join against the tables
+                //select photos.*,cnp_tampa.fid from photos left join cnp_tampa on cnp_tampa.fid=photos.id
+                String queryString = String.format("select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d",
+                        relationship.relatedTableName,
+                        relationship.baseTableName,
+                        relationship.baseTableColumn,
+                        relationship.relatedTableName,
+                        relationship.baseTableName,
+                        relationship.baseTableName,
+                        relationship.baseTableColumn,
+                        relationship.relatedTableName,
+                        relationship.relatedTableColumn,
+                        relationship.baseTableName,
+                        relationship.baseTableColumn,
+                        pt.getFid()
+                );
+
+                SQLiteDatabase sqliteDb = gpkgDb.getDb();
+
+                Cursor cursor = sqliteDb.rawQuery(queryString, null);
+                try {
+                    cursor.moveToFirst();
+                    while (!cursor.isAfterLast()) {
+                        int fididx = cursor.getColumnIndex("fid");
+                        int blobidx = cursor.getColumnIndex("data");
+                        if (fididx != -1 && blobidx != -1) {
+                            int fid = cursor.getInt(fididx);
+                            byte[] blob = cursor.getBlob(blobidx);
+                            RelatedTablesImageDialog.Row row = new RelatedTablesImageDialog.Row(fid, blob);
+                            rows.add(row);
+                            return rows;
+                        }
+                        cursor.moveToNext();
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+        }
+        return rows;
     }
 }

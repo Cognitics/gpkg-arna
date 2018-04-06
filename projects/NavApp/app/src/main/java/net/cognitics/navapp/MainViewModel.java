@@ -5,6 +5,8 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.wkb.geom.Point;
 
@@ -50,6 +52,10 @@ public class MainViewModel extends AndroidViewModel {
         gps = new GPSTracker(application.getApplicationContext());
     }
 
+    public ArrayList<RelatedTablesImageDialog.Row> displayRelatedFeaturesTest()
+    {
+        return featureManager.relatedFeaturesTest();
+    }
     public Boolean initializeRoute(String route)
     {
         //todo: initialize route in feature manager

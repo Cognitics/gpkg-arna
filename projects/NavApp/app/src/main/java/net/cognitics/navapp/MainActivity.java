@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     static final float ALPHA = 0.05f;
 
     static final int ROUTE_SELECT_REQUEST = 1;
+    static final int CNP_RT_TEST_REQUEST = 3;
 
     static final int REQUEST_CAMERA = 1;
     static final int REQUEST_LOCATION = 2;
@@ -76,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         public MainActivity() {
         //NULL
     }
-
     /**
      * Called from onCreate() when the proper permissions exist
      */
@@ -99,6 +99,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         //Toast.makeText(this, "onCreate()", Toast.LENGTH_LONG).show();
+        Button btn = (Button)findViewById(R.id.testButton);
+        btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ArrayList<RelatedTablesImageDialog.Row> rows = mViewModel.displayRelatedFeaturesTest();
+                Intent intent = new Intent(v.getContext(), RelatedTablesImageDialog.class);
+                intent.putExtra(RelatedTablesImageDialog.TITLE_TEXT, "CNP Relationships");
+
+                intent.putExtra(RelatedTablesImageDialog.PARCELABLE_ROWS, rows);
+                startActivityForResult(intent, CNP_RT_TEST_REQUEST);
+            }
+        });
     }
 
     /*
@@ -160,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         }
     }
-
 
     /*
      * Functionality for choosing gpkg from files
@@ -291,13 +301,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
             //hotfix for camera being upside down in reverse landscape mode
-            showCamera.updateRoll((int)roll);
+            if(showCamera!=null)
+                showCamera.updateRoll((int)roll);
             //hotfix for camera appearing black/crashing when app paused
             if (resumeCamera==1){
                // showCamera.resume();
                 resumeCamera=0;
             }
-            tvHeading.setText(" "+(int)bearing);
+            if(tvHeading!=null)
+                tvHeading.setText(" "+(int)bearing);
 
             //customGraphics.clearPoints();
             ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +21,7 @@ public class RelatedTablesImageDialog extends ListActivity {
 
     static class ViewHolder {
         protected TextView fid;
-        //protected Ima
+        protected ImageView imageView;
     }
 
     private ArrayList<RelatedTablesImageDialog.Row> rows;
@@ -34,6 +35,7 @@ public class RelatedTablesImageDialog extends ListActivity {
     public RelatedTablesImageDialog() {
         this.rows = new ArrayList<>();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,9 +45,9 @@ public class RelatedTablesImageDialog extends ListActivity {
         String titleText = intent.getStringExtra(this.TITLE_TEXT);
         TextView textView = findViewById(R.id.titleText);
         textView.setText(titleText);
-        //TODO: We actually need an array of byte arrays here.
         rows = intent.getParcelableArrayListExtra(PARCELABLE_ROWS);
-
+        if(rows==null)
+            return;
         ArrayAdapter<RelatedTablesImageDialog.Row> adapter = new RelatedTablesImageDialogAdapter(this, rows);
         setListAdapter(adapter);
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -60,7 +62,7 @@ public class RelatedTablesImageDialog extends ListActivity {
         });
     }
 
-    public class Row implements Parcelable
+    public static class Row implements Parcelable
     {
         public int fid;
         public byte[] blob;
@@ -74,6 +76,7 @@ public class RelatedTablesImageDialog extends ListActivity {
         Row(Parcel in)
         {
             this.fid = in.readInt();
+            this.blob = new byte[in.readInt()];
             in.readByteArray(this.blob);
         }
 
@@ -85,9 +88,11 @@ public class RelatedTablesImageDialog extends ListActivity {
         @Override
         public void writeToParcel(Parcel parcel, int i) {
             parcel.writeInt(fid);
-            parcel.writeByteArray(blob);
+            parcel.writeInt(blob.length);
+            parcel.writeByteArray(blob,0,blob.length);
+
         }
-        public  Parcelable.Creator<Row> CREATOR = new Parcelable.Creator<Row>() {
+        public static Parcelable.Creator<Row> CREATOR = new Parcelable.Creator<Row>() {
             @Override
             public Row createFromParcel(Parcel in) {
                 return new Row(in);
