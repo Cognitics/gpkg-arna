@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".TableDialogActivity" />
-        <activity android:name=".activity_table_row"></activity>
+        <activity android:name=".activity_table_row" />
+        <activity android:name=".RelatedTablesImageDialog"></activity>
     </application>
 
 </manifest>

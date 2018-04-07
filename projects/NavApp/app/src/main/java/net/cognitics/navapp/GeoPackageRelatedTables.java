@@ -2,12 +2,15 @@ package net.cognitics.navapp;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.db.GeoPackageDatabase;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * Created by kbentley on 3/10/2018.
@@ -30,10 +33,19 @@ public class GeoPackageRelatedTables {
 
     public Boolean IsRelatedTablesInstalled()
     {
+
         Cursor cursor = sqliteDb.rawQuery("select * from gpkg_extensions WHERE extension_name='related_tables'",null);
         if(cursor.getCount()>0)
             return Boolean.TRUE;
+        else
+        {
+            cursor = sqliteDb.rawQuery("select * from sqlite_master WHERE name='gpkgext_relations'",null);
+            if(cursor.getCount()>0)
+                return Boolean.TRUE;
+
+        }
         return Boolean.FALSE;
+
     }
 
     ArrayList<RelatedTablesRelationship> getRelationships(String layer)
@@ -47,8 +59,26 @@ public class GeoPackageRelatedTables {
             Cursor cursor = sqliteDb.rawQuery(sb.toString(), null);
             try {
                 cursor.moveToFirst();
-                while (cursor.moveToNext()) {
-
+                while (!cursor.isAfterLast()) {
+                    RelatedTablesRelationship relationship = new RelatedTablesRelationship();
+                    int idx = cursor.getColumnIndex("base_primary_column");
+                    if(idx!=-1)
+                        relationship.baseTableColumn = cursor.getString((idx));
+                    idx = cursor.getColumnIndex("related_table_name");
+                    if(idx!=-1)
+                        relationship.relatedTableName = cursor.getString((idx));
+                    idx = cursor.getColumnIndex("related_primary_column");
+                    if(idx!=-1)
+                        relationship.relatedTableColumn = cursor.getString((idx));
+                    idx = cursor.getColumnIndex("relation_name");
+                    if(idx!=-1)
+                        relationship.relationshipName = cursor.getString((idx));
+                    idx = cursor.getColumnIndex("mapping_table_name");
+                    if(idx!=-1)
+                        relationship.mappingTableName = cursor.getString((idx));
+                    relationship.baseTableName = layer;
+                    relationships.add(relationship);
+                    cursor.moveToNext();
                 }
             } finally {
                 cursor.close();
@@ -71,8 +101,9 @@ public class GeoPackageRelatedTables {
             Cursor cursor = sqliteDb.rawQuery(sb.toString(), null);
             try {
                 cursor.moveToFirst();
-                while (cursor.moveToNext()) {
+                while (!cursor.isAfterLast()) {
                     fids.add(cursor.getInt(0));
+                    cursor.moveToNext();
                 }
 
             } finally {

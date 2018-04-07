@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,21 +44,46 @@ public class FeatureManager {
 
     public ArrayList<PointFeature> cnpFeatures;
     public ArrayList<PointFeature> poiPointFeatures;
-
-    public ArrayList<PointFeature> getAoiPointFeatures() {
-        return aoiPointFeatures;
-    }
-
     public ArrayList<PointFeature> aoiPointFeatures;
     public ArrayList<LineStringFeature> routeFeatures;
+
+    public ArrayList<RelatedTablesRelationship> getCnpRelationships() {
+        return cnpRelationships;
+    }
+
+    public ArrayList<RelatedTablesRelationship> getPoiRelationships() {
+        return poiRelationships;
+    }
+
+    public ArrayList<RelatedTablesRelationship> getAoiRelationships() {
+        return aoiRelationships;
+    }
+
+    public ArrayList<RelatedTablesRelationship> getRouteRelationships() {
+        return routeRelationships;
+    }
+
+    public GeoPackageRelatedTables getRelatedTablesManager() {
+        return relatedTablesManager;
+    }
+
+    public ArrayList<RelatedTablesRelationship> cnpRelationships;
+    public ArrayList<RelatedTablesRelationship> poiRelationships;
+    public ArrayList<RelatedTablesRelationship> aoiRelationships;
+    public ArrayList<RelatedTablesRelationship> routeRelationships;
+
     private GeoPackage geopackage;
     private GeoPackageDatabase gpkgDb;
     private SQLiteDatabase sqliteDb;
     private GeoPackageManager manager;
     private Point geoCenter;
     private Context context;
+    private GeoPackageRelatedTables relatedTablesManager;
+    private final int CNP_TEST_REQUEST = 1;
 
-
+    public ArrayList<PointFeature> getAoiPointFeatures() {
+        return aoiPointFeatures;
+    }
     public RouteManager getRouteManager() {
         return routeManager;
     }
@@ -127,6 +153,10 @@ public class FeatureManager {
             cnpFeatures.clear();
             routeFeatures.clear();
             poiPointFeatures.clear();
+            cnpRelationships = new ArrayList<>();
+            poiRelationships = new ArrayList<>();
+            aoiRelationships = new ArrayList<>();
+            routeRelationships = new ArrayList<>();
 
             List<String> tables = geopackage.getFeatureTables();
 
@@ -141,11 +171,36 @@ public class FeatureManager {
                 if (!tableRouteName.equalsIgnoreCase(route))
                     continue;
 
-                //if(table.substring())
+                if (table.startsWith("cnp_")) {
+                    cnpRelationships = relatedTablesManager.getRelationships(table);
+                    if(cnpRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", cnpRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                } else if (table.startsWith("poi_")) {
+                    poiRelationships = relatedTablesManager.getRelationships(table);
+                    if(poiRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", poiRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                } else if (table.startsWith("aoi_")) {
+                    aoiRelationships = relatedTablesManager.getRelationships(table);
+                    if(aoiRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", aoiRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                } else if (table.startsWith("route_")) {
+                    routeRelationships = relatedTablesManager.getRelationships(table);
+                    if(routeRelationships.size()>0) {
+                        String msg = String.format("Found %d relationships for %s", routeRelationships.size(), table);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                }
+
                 FeatureDao featureDao = geopackage.getFeatureDao(table);
 
                 FeatureCursor featureCursor = featureDao.queryForAll();
-                int numFeatures = featureCursor.getCount();
+                //int numFeatures = featureCursor.getCount();
 
                 try {
                     while (featureCursor.moveToNext()) {
@@ -248,6 +303,7 @@ public class FeatureManager {
         if(geopackage!=null) {
             gpkgDb = geopackage.getConnection().getDb();
             sqliteDb = gpkgDb.getDb();
+            relatedTablesManager = new GeoPackageRelatedTables(geopackage);
             return TRUE;
         }
         return FALSE;
@@ -255,5 +311,59 @@ public class FeatureManager {
 
     public Point getGeoCenter() {
         return geoCenter;
+    }
+
+    public ArrayList<RelatedTablesImageDialog.Row> relatedFeaturesTest() {
+        ArrayList<RelatedTablesImageDialog.Row> rows = new ArrayList<>();
+        // For now, just show relationships for the first type of relationship there is.
+        if (cnpRelationships.size() > 0) {
+            RelatedTablesRelationship relationship = cnpRelationships.get(0);
+
+            GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
+
+
+            for (PointFeature pt : cnpFeatures) {
+                //ArrayList<Integer> fids = gpkgRTE.getRelatedFIDs(relationship, pt.getFid());
+                // Query for the data the hard way. It would be cleaner and probably faster
+                // to do a join against the tables
+                //select photos.*,cnp_tampa.fid from photos left join cnp_tampa on cnp_tampa.fid=photos.id
+                String queryString = String.format("select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d",
+                        relationship.relatedTableName,
+                        relationship.baseTableName,
+                        relationship.baseTableColumn,
+                        relationship.relatedTableName,
+                        relationship.baseTableName,
+                        relationship.baseTableName,
+                        relationship.baseTableColumn,
+                        relationship.relatedTableName,
+                        relationship.relatedTableColumn,
+                        relationship.baseTableName,
+                        relationship.baseTableColumn,
+                        pt.getFid()
+                );
+
+                SQLiteDatabase sqliteDb = gpkgDb.getDb();
+
+                Cursor cursor = sqliteDb.rawQuery(queryString, null);
+                try {
+                    cursor.moveToFirst();
+                    while (!cursor.isAfterLast()) {
+                        int fididx = cursor.getColumnIndex("fid");
+                        int blobidx = cursor.getColumnIndex("data");
+                        if (fididx != -1 && blobidx != -1) {
+                            int fid = cursor.getInt(fididx);
+                            byte[] blob = cursor.getBlob(blobidx);
+                            RelatedTablesImageDialog.Row row = new RelatedTablesImageDialog.Row(fid, blob);
+                            rows.add(row);
+                            return rows;
+                        }
+                        cursor.moveToNext();
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+        }
+        return rows;
     }
 }
