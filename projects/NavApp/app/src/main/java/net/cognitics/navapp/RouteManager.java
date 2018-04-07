@@ -231,8 +231,6 @@ public class RouteManager {
                     {
                         currentDistance = vertDistance;
                         nextIndex = i;
-                        //todo: arrived at waypoint toast
-                        Toast.makeText(context, "Arrived at waypoint: " + nextIndex, Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -241,6 +239,7 @@ public class RouteManager {
             // If we just snapped, advance to the next point
             nextIndex += 1;
             currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(nextIndex));
+            Toast.makeText(context, "Arrived at waypoint: " + nextIndex, Toast.LENGTH_LONG).show();
         }
         // Are we more than X meters from the current route? If so, find the nearest point that intercepts the route line
 
