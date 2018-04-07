@@ -1,6 +1,7 @@
 package net.cognitics.navapp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.AppCompatImageButton;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class NavPoint extends AppCompatImageButton{
         textView = new TextView(context);
         setMinimumHeight(50);
         setMinimumWidth(50);
+        textView.setTextColor(Color.parseColor("#e500ff"));
 
     }
 

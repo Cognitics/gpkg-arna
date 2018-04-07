@@ -110,15 +110,26 @@ public class CustomGraphics extends View
         this.pitch=pitch;
     }
 
-    public void addPoint(FrameLayout camera, float bearing, float pitch, String id){
+    public void addPoint(FrameLayout camera, float bearing, float pitch, String id)
+    {
+        addPoint(camera,bearing,pitch,id,0,null);
+    }
+
+    public void addPoint(FrameLayout camera, float bearing, float pitch, String id, float distance, String title){
+
         if(navMap.containsKey(id))
         {
+            if(title!=null)
+                navMap.get(id).getText().setText(String.format("%s: %.3fkm",title,distance/1000.0));
             updatePoint(bearing,pitch,id);
             return;
         }
         this.camera=camera;
         NavPoint newPoint = new NavPoint(context,bearing,pitch);
-        newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
+        if(title!=null && title=="*")
+            newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
+        else
+            newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.cnpicon));
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
                                         public void onClick(View v) {
@@ -129,7 +140,8 @@ public class CustomGraphics extends View
         navMap.put(id,newPoint);
         camera.addView(newPoint);
         camera.addView(newPoint.getText());
-        newPoint.getText().setText(" Waypoint X \n\t500m");
+        if(title!=null)
+            navMap.get(id).getText().setText(String.format("%s: %.3fkm",title,distance/1000.0));
     }
 
     public void updatePoint(float bearing, float pitch, String id)

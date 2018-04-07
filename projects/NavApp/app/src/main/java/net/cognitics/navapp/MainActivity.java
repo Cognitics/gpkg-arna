@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Basic app creation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         TextView msgText = (TextView) findViewById(R.id.messages);
         msgText.setText(mViewModel.messageLog);
@@ -312,19 +314,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 tvHeading.setText(" "+(int)bearing);
 
             //customGraphics.clearPoints();
+            /*
             ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();
             for(PointFeature pointFeature : cnpFeatures)
             {
                 double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(),mViewModel.getGps().getElevation());
+                double d = pointFeature.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(),mViewModel.getGps().getElevation());
                 //todo: add different colors for cnp point to differentiate from the next route point
                 //todo: make them clickable?
                 //todo: When I enable the following line, the screen doesn't refresh on my phone
                 String featureName = pointFeature.getAttribute("name");
+
                 if(featureName==null)
                 {
                     featureName = Integer.toString(pointFeature.getFid());
                 }
-                customGraphics.addPoint(cameraPreview, (float) b, 90,featureName);
+                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName);
+            }
+            */
+            ArrayList<PointFeature> poiFeatures = mViewModel.getFeatureManager().getPoiPointFeatures();
+            for(PointFeature pointFeature : poiFeatures)
+            {
+                double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(),mViewModel.getGps().getElevation());
+                double d = pointFeature.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(),mViewModel.getGps().getElevation());
+                //todo: add different colors for cnp point to differentiate from the next route point
+                //todo: make them clickable?
+                //todo: When I enable the following line, the screen doesn't refresh on my phone
+                String featureName = pointFeature.getAttribute("name");
+
+                if(featureName==null)
+                {
+                    featureName = Integer.toString(pointFeature.getFid());
+                }
+                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName);
             }
             RouteManager rm = mViewModel.getRouteManager();
             if(rm!=null) {
@@ -336,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d",d/1000.0,b,idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90,"route_point");
+                customGraphics.addPoint(cameraPreview, (float) b, 90,"route_point",(float)d,"*");
                 customGraphics.updatePositions();
             }
         }

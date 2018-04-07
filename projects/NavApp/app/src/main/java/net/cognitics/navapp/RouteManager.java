@@ -1,8 +1,10 @@
 package net.cognitics.navapp;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import mil.nga.wkb.geom.Point;
 
 import static java.lang.Boolean.FALSE;
@@ -18,6 +20,7 @@ import static java.lang.Boolean.TRUE;
 
 public class RouteManager {
 
+    private Context context;
     private double currentBearing;
     private double currentDistance;
     // All available Routes. We'll use the first one for now.
@@ -35,6 +38,9 @@ public class RouteManager {
     private int fid = 0;//feature id from the geopackage. Should always be 0
 
     private HashMap<String, String> attributes;
+
+    private Boolean offRoute = FALSE;
+    private Point routeInterceptPoint;
 
     private void updateRoute()
     {
@@ -83,7 +89,7 @@ public class RouteManager {
         return nextIndex;
     }
 
-    RouteManager(ArrayList<Point> route,HashMap<String, String> attributes, int fid)
+    RouteManager(ArrayList<Point> route,HashMap<String, String> attributes, int fid, Context context)
     {
         currentRouteUTM = new ArrayList<Point>();
         currentRoute  = new ArrayList<Point>();
@@ -93,7 +99,47 @@ public class RouteManager {
         needsUpdate = TRUE;
         this.attributes = attributes;
         this.fid = fid;
+        this.context = context;
 
+    }
+
+    /**
+     * Finds the point on a line segment (lineA->lineB) that is nearest to pt.
+     * @param lineA The first vert on the segment
+     * @param lineB The second vert on the segment
+     * @param pt The vert to start from
+     * @return A point on the segment (lineA->lineB) that is nearest to pt.
+     */
+    private Point findInterceptPoint(Point lineA, Point lineB, Point pt)
+    {
+        Point outputPt;
+        lineA.setZ(0.0);
+        lineB.setZ(0.0);
+        pt.setZ(0.0);
+
+        Point lineDelta = PointMath.subtract(lineB, lineA);
+        double mag2 = PointMath.length2(lineDelta);
+
+        double u = ( ( ( pt.getX() - lineA.getX() ) * ( lineB.getX() - lineA.getX() ) ) +
+                ( ( pt.getY() - lineA.getY() ) * ( lineB.getY() - lineA.getY() ) ) ) / mag2;
+
+        if(u < 0.0f)
+        {
+            outputPt = lineA;
+        }
+        else if(u > 1.0f)
+        {
+            outputPt = lineB;
+        }
+        else
+        {
+            outputPt = PointMath.add(lineA ,(PointMath.multiply(lineDelta,u)));
+        }
+
+        // get the distance
+        //Point distvec = (PointMath.subtract(lineA,outputPt);
+        //double dist = PointMath.length2(distvec);
+        return outputPt;
     }
 
     private double pointToPointDistance(Point a, Point b)
@@ -136,7 +182,28 @@ public class RouteManager {
         if(currentPositionGeo==null || currentPositionUTM==null)
             return;
 
-        double SNAP_DISTANCE = 1;
+        // The distance you are allowed to be off the route before it puts you on a path to the nearest point on the route from your current location
+        final double OFF_ROUTE_DISTANCE = 15;
+        double distanceToSegment = OFF_ROUTE_DISTANCE;
+        if(nextIndex==0)
+            distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex),currentRouteUTM.get(nextIndex+1));
+        else
+            distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex-1),currentRouteUTM.get(nextIndex));
+        if(distanceToSegment > OFF_ROUTE_DISTANCE) {
+            offRoute = TRUE;
+            if(nextIndex==0)
+                routeInterceptPoint = findInterceptPoint(currentRouteUTM.get(nextIndex), currentRouteUTM.get(nextIndex + 1), currentPositionUTM);
+            else
+                routeInterceptPoint = findInterceptPoint(currentRouteUTM.get(nextIndex-1),currentRouteUTM.get(nextIndex),currentPositionUTM);
+            currentDistance = pointToPointDistance(currentPositionUTM,routeInterceptPoint);
+            return;
+        }
+        else {
+            routeInterceptPoint = null;
+            offRoute = FALSE;
+            currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(nextIndex));
+        }
+        double SNAP_DISTANCE = 15;
         int numPoints = currentRoute.size();
         if(numPoints<2)
             return;
@@ -147,37 +214,41 @@ public class RouteManager {
         // Starting with the segment ending at the current index, compare the distance
         // to each segment. If any of the segments have a shorter distance than the current segment distance, then advance to that segment
         // Special case: If within xxx meters of the 'nextIndex' vertex, keep going to the next vert until the distance is greated than the 'snap' distance
-        for(int i=0;i<numPoints;i++)
+        Boolean snappedToVert = false;
+        for(int i=nextIndex;i<numPoints;i++)
         {
             double vertDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(i));
             if(vertDistance < SNAP_DISTANCE)
             {
+                snappedToVert = TRUE;
                 currentDistance = vertDistance;
                 nextIndex = i;
-                for(int j=i;j<numPoints;j++)
+                for(int j=nextIndex;j<numPoints;j++)
                 {
                     // Continue along the route until the next point is further away than the snap distance
                     vertDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(i));
-                    if(vertDistance >= SNAP_DISTANCE)
-                    {
-                        return;
-                    }
-                    else
+                    if(vertDistance < currentDistance)
                     {
                         currentDistance = vertDistance;
                         nextIndex = i;
+                        //todo: arrived at waypoint toast
+                        Toast.makeText(context, "Arrived at waypoint: " + nextIndex, Toast.LENGTH_LONG).show();
                     }
                 }
-                // We've snapped to a vert, so skip the segment distance test
-                return;
             }
         }
+        if(snappedToVert) {
+            // If we just snapped, advance to the next point
+            nextIndex += 1;
+            currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(nextIndex));
+        }
+        // Are we more than X meters from the current route? If so, find the nearest point that intercepts the route line
 
         // We're going to assume that we never go backwards. So keep navigating to the nextIndex until
         // the next segment length is closer
 
 
-        if(nextIndex==0)
+        /*if(nextIndex==0)
         {
             currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(0));
         }
@@ -197,7 +268,7 @@ public class RouteManager {
                     currentDistance = distanceToSegment;
                 }
             }
-        }
+        }*/
 
     }
 
@@ -205,7 +276,12 @@ public class RouteManager {
     {
         if(currentPositionGeo==null || currentPositionUTM==null || currentRoute.size()<2)
             return;
-        currentBearing = GreatCircle.getBearing(currentPositionGeo,currentRoute.get(nextIndex));
+        if(!offRoute || (routeInterceptPoint!=null))
+        {
+            currentBearing = GreatCircle.getBearing(currentPositionGeo,currentRoute.get(nextIndex));
+        }
+        else
+            currentBearing = GreatCircle.getBearing(currentPositionGeo,routeInterceptPoint);
     }
 
     //Get the geographic coordinates nearest the current position
@@ -229,6 +305,7 @@ public class RouteManager {
     double getNearestBearing()
     {
         updateRoute();
+
         return currentBearing;
     }
 

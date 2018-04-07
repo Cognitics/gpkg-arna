@@ -43,6 +43,11 @@ public class FeatureManager {
     }
 
     public ArrayList<PointFeature> cnpFeatures;
+
+    public ArrayList<PointFeature> getPoiPointFeatures() {
+        return poiPointFeatures;
+    }
+
     public ArrayList<PointFeature> poiPointFeatures;
     public ArrayList<PointFeature> aoiPointFeatures;
     public ArrayList<LineStringFeature> routeFeatures;
@@ -114,7 +119,7 @@ public class FeatureManager {
             numVerts++;
         }
         if (table.startsWith("route_")) {
-            routeManager = new RouteManager(routePoints, attributes, fid);
+            routeManager = new RouteManager(routePoints, attributes, fid, context);
         }
         geoCenter.setX(totalX / numVerts);
         geoCenter.setY(totalY / numVerts);
