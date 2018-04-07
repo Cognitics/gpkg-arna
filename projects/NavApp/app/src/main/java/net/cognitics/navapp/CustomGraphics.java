@@ -1,19 +1,27 @@
 package net.cognitics.navapp;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -26,6 +34,7 @@ public class CustomGraphics extends View
     float pitch;
     public Context context;
     FrameLayout camera;
+    private Activity mainActivity;
     //private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
     private HashMap<String,NavPoint> navMap=new HashMap<String,NavPoint>();
 
@@ -126,6 +135,7 @@ public class CustomGraphics extends View
         }
         this.camera=camera;
         NavPoint newPoint = new NavPoint(context,bearing,pitch);
+        newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
         if(title!=null && title=="*")
             newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
         else
@@ -134,6 +144,45 @@ public class CustomGraphics extends View
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
                                         public void onClick(View v) {
                                             Toast.makeText(context, "Hello World", Toast.LENGTH_LONG).show();
+                                            PopupMenu popupMenu = new PopupMenu(context,newPoint);
+                                            popupMenu.getMenuInflater().inflate(R.menu.navpoint_select,popupMenu.getMenu());
+                                            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                                public boolean onMenuItemClick(MenuItem item) {
+                                                    switch (item.getItemId()) {
+                                                        case R.id.snap:
+                                                            String file = "Picturetest.jpg";
+                                                            File newfile = new File(file);
+                                                            try {
+                                                                newfile.createNewFile();
+                                                            }
+                                                            catch (IOException e)
+                                                            {
+                                                            }
+
+                                                            Uri outputFileUri = Uri.fromFile(newfile);
+
+                                                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                                            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+                                                            ((Activity)context).startActivityForResult(cameraIntent, 0);
+                                                            break;
+
+                                                        case R.id.select:
+                                                            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                                                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                                            // Start the Intent
+                                                            ((Activity)context).startActivityForResult(galleryIntent, 0);
+                                                            break;
+
+
+                                                        default:
+                                                            break;
+
+                                                    }
+                                                    return true;
+                                                }
+                                            });
+                                            popupMenu.show();
                                         }
                                     });
 

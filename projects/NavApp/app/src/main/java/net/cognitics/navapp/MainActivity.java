@@ -16,6 +16,7 @@ import android.support.v13.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageButton;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -27,6 +28,7 @@ import com.karan.churi.PermissionManager.PermissionManager.statusArray;
 
 import android.view.View;
 import android.support.v7.app.AlertDialog;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -446,6 +448,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             recreate();
         }
     }
+
+   // public void createPMenu(NavPoint navPoint, AppCompatImageButton button){
+
+   // }
 
 
 }
