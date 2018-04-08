@@ -260,7 +260,7 @@ public class RouteManager {
             else
                 Toast.makeText(context, "Arrived at waypoint: " + (nextIndex-1), Toast.LENGTH_LONG).show();
         }
-        
+
 
     }
 

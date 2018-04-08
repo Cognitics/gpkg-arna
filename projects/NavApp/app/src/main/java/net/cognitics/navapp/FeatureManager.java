@@ -371,4 +371,16 @@ public class FeatureManager {
         }
         return rows;
     }
+
+    public void addMediaTable(String layerName)
+    {
+        // If not exist...
+        String query = "CREATE TABLE IF NOT EXISTS 'media'" + layerName + " ( id INTEGER PRIMARY KEY AUTOINCREMENT, data BLOB NOT NULL, content_type TEXT NOT NULL )";
+        SQLiteDatabase sqliteDb = gpkgDb.getDb();
+
+        sqliteDb.execSQL(query);
+
+    }
+
+
 }

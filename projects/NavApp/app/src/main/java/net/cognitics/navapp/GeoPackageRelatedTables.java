@@ -87,8 +87,51 @@ public class GeoPackageRelatedTables {
         return relationships;
     }
 
+    public void enableRelatedTablesExtension()
+    {
+        SQLiteDatabase sqliteDb = gpkgDb.getDb();
+        // First make sure the table exists:
+        String query = "CREATE TABLE IF NOT EXISTS 'gpkgext_relations' ( id INTEGER PRIMARY KEY AUTOINCREMENT, base_table_name TEXT NOT NULL, base_primary_column TEXT NOT NULL DEFAULT 'id', related_table_name TEXT NOT NULL, related_primary_column TEXT NOT NULL DEFAULT 'id', relation_name TEXT NOT NULL, mapping_table_name TEXT NOT NULL UNIQUE )";
+        sqliteDb.execSQL(query);
+
+    }
+    public void addRelationship(RelatedTablesRelationship relationship)
+    {
+        enableRelatedTablesExtension();
+        //todo: Do we assume the table does not exist, or do we make this work (not crash with a sql exception) if it does?
+        SQLiteDatabase sqliteDb = gpkgDb.getDb();
+        enableRelatedTablesExtension();
+
+        // Create the mapping table
+        String query = "CREATE TABLE IF NOT EXISTS '" + relationship.mappingTableName + "' ( base_id INTEGER NOT NULL, related_id INTEGER NOT NULL )";
+        sqliteDb.execSQL(query);
+        // Add to the gpkgext_relationships table
+        query = "INSERT INTO gpkgext_relations (base_table_name, base_primary_column,related_table_name,related_primary_column,relation_name,mapping_table_name)";
+        query += String.format("VALUES('%s','%s','%s','%s','%s','%s')",
+                relationship.baseTableName,
+                relationship.baseTableColumn,
+                relationship.relatedTableName,
+                relationship.relatedTableColumn,
+                relationship.relationshipName,
+                relationship.mappingTableName);
+        Cursor cursor = sqliteDb.rawQuery(query, null);
+        try {
+            cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
+        query = "INSERT INTO gpkg_extensions (table_name,extension_name,scope) VALUES(";
+        query += String.format("'%s','related_tables','Related Tables Mapping Table','read-write')",relationship.mappingTableName);
+        cursor = sqliteDb.rawQuery(query, null);
+        try {
+            cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
+
+    }
     // Get related tables for a given layer
-    ArrayList<Integer> getRelatedFIDs(RelatedTablesRelationship relationship, int fid)
+    public ArrayList<Integer> getRelatedFIDs(RelatedTablesRelationship relationship, int fid)
     {
         ArrayList<Integer> fids = new ArrayList();
         if(extensionInstalled) {
@@ -111,5 +154,46 @@ public class GeoPackageRelatedTables {
             }
         }
         return fids;
+    }
+    public void addFeatureRelationship(RelatedTablesRelationship relationship, int baseFID, int relatedFID)
+    {
+        String query = String.format("INSERT INTO %s (base_id,related_id) VALUES(%d,%d)");
+        Cursor cursor = sqliteDb.rawQuery(query, null);
+        try {
+            cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
+    }
+
+    // This table has a fixed schema, so add it in this class.
+    public void addMediaTable(String name)
+    {
+        // Create the mapping table
+        String query = "CREATE TABLE IF NOT EXISTS '" + name + "' ( id INTEGER PRIMARY KEY AUTOINCREMENT, data BLOB NOT NULL, content_type TEXT NOT NULL )";
+        sqliteDb.execSQL(query);
+    }
+
+    /**
+     *
+     * @param mediaTable Name of the table to insert into
+     * @param blob Binary data to insert into the 'data' column
+     * @param contentType The type of content
+     * @return
+     */
+    public int addMedia(String mediaTable, byte[] blob, String contentType)
+    {
+        String query = "INSERT INTO " + mediaTable + " (data,content_type) VALUES(?,?)";
+        sqliteDb.execSQL(query, new Object[]{ blob, contentType });
+
+        int fid = -1;
+        Cursor cursor = sqliteDb.rawQuery("SELECT last_insert_rowid()", null);
+        try {
+            if(cursor.moveToFirst())
+                fid = cursor.getInt(0);
+        } finally {
+            cursor.close();
+        }
+        return fid;
     }
 }
