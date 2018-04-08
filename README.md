@@ -15,6 +15,6 @@ Augmented Reality Navigation Assistance Using GeoPackage
  - Cross-platform operation, e.g. browser-based solution
  - Utilize proposed RTE “features” relation type linking routes and their CNPs & POIs
  - Additional functionality & UI/UX features addressing ease of use in high-stress scenarios.
-* = top priority functionality required for prize award)
+  * = top priority functionality required for prize award)
 
 __DEADLINE: APRIL 15TH__
