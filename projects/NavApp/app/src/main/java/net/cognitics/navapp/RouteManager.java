@@ -184,9 +184,28 @@ public class RouteManager {
 
         // The distance you are allowed to be off the route before it puts you on a path to the nearest point on the route from your current location
         final double OFF_ROUTE_DISTANCE = 15;
+        double SNAP_DISTANCE = 15;
+        int numPoints = currentRoute.size();
+        if(numPoints<2)
+            return;
+
         double distanceToSegment = OFF_ROUTE_DISTANCE;
-        if(nextIndex==0)
-            distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex),currentRouteUTM.get(nextIndex+1));
+        if(nextIndex==0) {
+            double closestSegmentDistance = Double.MAX_VALUE;
+            // Special case when starting a route...find the nearest segment to the current position and set the route there,
+            // so the user isn't always navigated to the start of the route.
+            for(int i=0;i<(numPoints-1);i++)
+            {
+                double dist = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(i),currentRouteUTM.get(i+1));
+                if(dist < closestSegmentDistance)
+                {
+                    nextIndex = i+1;
+                    closestSegmentDistance = dist;
+                }
+
+            }
+            distanceToSegment = closestSegmentDistance;//pointToSegmentDistance(currentPositionUTM, currentRouteUTM.get(nextIndex), currentRouteUTM.get(nextIndex + 1));
+        }
         else
             distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex-1),currentRouteUTM.get(nextIndex));
         if(distanceToSegment > OFF_ROUTE_DISTANCE) {
@@ -203,10 +222,7 @@ public class RouteManager {
             offRoute = FALSE;
             currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(nextIndex));
         }
-        double SNAP_DISTANCE = 15;
-        int numPoints = currentRoute.size();
-        if(numPoints<2)
-            return;
+
 
         //double closestVertDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(0));
 
@@ -238,36 +254,13 @@ public class RouteManager {
         if(snappedToVert) {
             // If we just snapped, advance to the next point
             nextIndex += 1;
-            currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(nextIndex));
-            Toast.makeText(context, "Arrived at waypoint: " + nextIndex, Toast.LENGTH_LONG).show();
+
+            if(nextIndex>numPoints)
+                Toast.makeText(context, "You have arrived at the destination!", Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(context, "Arrived at waypoint: " + (nextIndex-1), Toast.LENGTH_LONG).show();
         }
-        // Are we more than X meters from the current route? If so, find the nearest point that intercepts the route line
-
-        // We're going to assume that we never go backwards. So keep navigating to the nextIndex until
-        // the next segment length is closer
-
-
-        /*if(nextIndex==0)
-        {
-            currentDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(0));
-        }
-        else
-        {
-            currentDistance = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex-1),currentRouteUTM.get(nextIndex));
-        }
-
-        for(int i=nextIndex;i<numPoints;i++)
-        {
-            if(i>0)
-            {
-                double distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(i-1),currentRouteUTM.get(i));
-                if(currentDistance>distanceToSegment)
-                {
-                    nextIndex = i;
-                    currentDistance = distanceToSegment;
-                }
-            }
-        }*/
+        
 
     }
 
