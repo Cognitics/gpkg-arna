@@ -155,6 +155,7 @@ public class CustomGraphics extends View
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
                                         public void onClick(View v) {
+
                                             //Get the PointFeature associated with this NavPoint
                                             //We can use this to attach a new photo
                                             PointFeature pt = (PointFeature)v.getTag();
@@ -198,6 +199,8 @@ public class CustomGraphics extends View
 
                                                         }
                                                         return true;
+
+
                                                     }
                                                 });
                                                 popupMenu.show();

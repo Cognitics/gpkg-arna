@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 resumeCamera=0;
             }
             if(tvHeading!=null)
-                tvHeading.setText(" "+(int)bearing);
+                tvHeading.setText("Heading:\n"+(int)bearing);
 
             //customGraphics.clearPoints();
             /*
