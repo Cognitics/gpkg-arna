@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -72,10 +73,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     static final int ROUTE_SELECT_REQUEST = 1;
     static final int CNP_RT_TEST_REQUEST = 3;
 
-    static final int REQUEST_CAMERA = 1;
-    static final int REQUEST_LOCATION = 2;
-    static final int REQUEST_MEDIA_WRITE = 3;
-    static final int REQUEST_MEDIA_READ = 4;
+    public static final int REQUEST_CAMERA = 1;
+    public static final int REQUEST_LOCATION = 2;
+    public static final int REQUEST_MEDIA_WRITE = 3;
+    public static final int REQUEST_MEDIA_READ = 4;
+    public static final int REQUEST_TAKE_PHOTO = 5;
+    public static final int REQUEST_PICK_PHOTO = 6;
 
         public MainActivity() {
         //NULL
@@ -157,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String routeName =  tableName.substring(routePrefix.length());
             Toast.makeText(this, "You selected route: " + routeName, Toast.LENGTH_LONG).show();
             return mViewModel.initializeRoute(routeName);
-
         }
         else
         {
@@ -166,12 +168,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+        if (requestCode == ROUTE_SELECT_REQUEST && resultCode == Activity.RESULT_OK) {
             String rowText = data.getStringExtra(TableDialogActivity.RESULT_TEXT);
             parseAndInitializeRoute(rowText);
+
+        }
+        else if((requestCode==REQUEST_TAKE_PHOTO) && resultCode==Activity.RESULT_OK) {
+
+        }
+        else if((requestCode==REQUEST_PICK_PHOTO) && resultCode==Activity.RESULT_OK) {
 
         }
     }
@@ -331,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 {
                     featureName = Integer.toString(pointFeature.getFid());
                 }
-                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName);
+                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName,pointFeature);
             }
             */
             ArrayList<PointFeature> poiFeatures = mViewModel.getFeatureManager().getPoiPointFeatures();
@@ -348,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 {
                     featureName = Integer.toString(pointFeature.getFid());
                 }
-                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName);
+                customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName,pointFeature);
             }
             RouteManager rm = mViewModel.getRouteManager();
             if(rm!=null) {
@@ -360,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d",d/1000.0,b,idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90,"route_point",(float)d,"*");
+                customGraphics.addPoint(cameraPreview, (float) b, 90,"route_point",(float)d,"*",null);
                 customGraphics.updatePositions();
             }
         }

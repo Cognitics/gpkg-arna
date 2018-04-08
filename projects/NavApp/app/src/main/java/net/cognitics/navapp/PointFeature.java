@@ -39,8 +39,9 @@ public class PointFeature {
     // Buffer for index-array
     private ByteBuffer indexBuffer;
 
-    PointFeature(WGS84 geoCoordinates, int fid)
+    PointFeature(WGS84 geoCoordinates, int fid, String layerName)
     {
+        this.layerName = layerName;
         this.fid = fid;
         this.geoCoordinates = new WGS84(geoCoordinates.getLatitude(),geoCoordinates.getLongitude());
         // Project to UTM
