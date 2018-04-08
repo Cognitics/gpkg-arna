@@ -9,7 +9,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.view.MenuItem;
@@ -22,7 +24,9 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -34,10 +38,8 @@ public class CustomGraphics extends View
     float pitch;
     public Context context;
     FrameLayout camera;
-    private Activity mainActivity;
-    //private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
     private HashMap<String,NavPoint> navMap=new HashMap<String,NavPoint>();
-
+    String mCurrentPhotoPath;
     public CustomGraphics(Context con)
     {
         super(con);
@@ -163,20 +165,20 @@ public class CustomGraphics extends View
                                                 public boolean onMenuItemClick(MenuItem item) {
                                                     switch (item.getItemId()) {
                                                         case R.id.snap:
-                                                            String file = "Picturetest.jpg";
-                                                            File newfile = new File(file);
+                                                            File newfile;
                                                             try {
-                                                                newfile.createNewFile();
+                                                                newfile=createImageFile();
                                                             }
                                                             catch (IOException e)
                                                             {
+                                                                //break;
                                                             }
 
-                                                            Uri outputFileUri = Uri.fromFile(newfile);
+                                                            //Uri outputFileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".my.package.name.provider", newfile);
 
                                                             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                                            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
+                                                            //cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+                                                            cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                                             ((Activity)context).startActivityForResult(cameraIntent, 0);
                                                             break;
 
@@ -223,5 +225,20 @@ public class CustomGraphics extends View
         navMap.clear();
     }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
 
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
 }
