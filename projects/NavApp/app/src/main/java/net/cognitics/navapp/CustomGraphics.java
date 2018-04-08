@@ -74,7 +74,13 @@ public class CustomGraphics extends View
             boolean showText = true;
             //Offset X and Y based on deltaPitch and deltaBearing
             if (Math.abs(n.getBearing()-bearing)>180){
-                tX += 12 * (bearing-(n.getBearing()));
+                if (bearing>180) {
+                    //Bearing around 330, target around 30, should be a positive result(60?)
+                    tX += 12 * (Math.abs(bearing-360) + (n.getBearing()));
+                }else{
+                    //Bearing around 30, target around 330, should be negative result(-60?)
+                    tX -= 12 * (bearing + Math.abs((n.getBearing())-360));
+                }
             }else {
                 tX += 12 * ((n.getBearing()) - (bearing));
             }
