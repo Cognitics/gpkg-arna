@@ -18,4 +18,6 @@ Augmented Reality Navigation Assistance Using GeoPackage
 
  <a id="note1" href="#note1ref"><sup>1</sup></a>Top priority functionality required for prize award)
 
+![Mockup Main Screen] (./main_screen_mockup.png)
+
 __DEADLINE: APRIL 15TH__
