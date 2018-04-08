@@ -120,7 +120,7 @@ public class GeoPackageRelatedTables {
         } finally {
             cursor.close();
         }
-        query = "INSERT INTO gpkg_extensions (table_name,extension_name,scope) VALUES(";
+        query = "INSERT INTO gpkg_extensions (table_name,extension_name,definition,scope) VALUES(";
         query += String.format("'%s','related_tables','Related Tables Mapping Table','read-write')",relationship.mappingTableName);
         cursor = sqliteDb.rawQuery(query, null);
         try {

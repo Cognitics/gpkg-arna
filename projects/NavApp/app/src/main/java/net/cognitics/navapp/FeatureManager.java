@@ -85,6 +85,7 @@ public class FeatureManager {
     private Context context;
     private GeoPackageRelatedTables relatedTablesManager;
     private final int CNP_TEST_REQUEST = 1;
+    private File geoPackageFile;
 
     public ArrayList<PointFeature> getAoiPointFeatures() {
         return aoiPointFeatures;
@@ -182,6 +183,24 @@ public class FeatureManager {
                         String msg = String.format("Found %d relationships for %s", cnpRelationships.size(), table);
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
                     }
+                    else
+                    {
+                        // Add a media table and a relationship for photos
+                        String mediaTable = route + "_photos";
+                        relatedTablesManager.addMediaTable(mediaTable);
+                        // Add the relationship table
+                        RelatedTablesRelationship relationship = new RelatedTablesRelationship();
+                        relationship.baseTableName = table;
+                        relationship.baseTableColumn = "fid";
+                        relationship.relatedTableName = mediaTable;
+                        relationship.relatedTableColumn = "id";
+                        relationship.relationshipName = "media";
+                        relationship.mappingTableName = table + "_photos";
+                        relatedTablesManager.addRelationship(relationship);
+                        save();
+                        String msg = String.format("Created media relationship for " + route);
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
                 } else if (table.startsWith("poi_")) {
                     poiRelationships = relatedTablesManager.getRelationships(table);
                     if(poiRelationships.size()>0) {
@@ -245,7 +264,7 @@ public class FeatureManager {
 
                         } else if (geometry instanceof Point) {
                             Point pt = (Point) geometry;
-                            PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid);
+                            PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid, table);
                             feature.setAttributes(attributes);
                             if (table.startsWith("cnp_")) {
                                 cnpFeatures.add(feature);
@@ -260,7 +279,7 @@ public class FeatureManager {
                         } else if (geometry instanceof MultiPoint) {
                             MultiPoint mp = (MultiPoint) geometry;
                             for (Point pt : mp.getGeometries()) {
-                                PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid);
+                                PointFeature feature = new PointFeature(new WGS84(pt.getY(), pt.getX()), fid, table);
                                 feature.setAttributes(attributes);
                                 if (table.startsWith("cnp_")) {
                                     cnpFeatures.add(feature);
@@ -298,12 +317,17 @@ public class FeatureManager {
     }
 
     public Boolean open(String fileName) {
-        File f = new File(fileName);
-        String geoPackageName = f.getName();
-        // Open a GeoPackage
-        if (!manager.exists(geoPackageName)) {
-            manager.importGeoPackage(geoPackageName, f);
+
+        geoPackageFile = new File(fileName);
+        //geoPackageFile.getPath();
+        String geoPackageName = geoPackageFile.getName();
+        // Open a GeoPackage, we won't use cache for now (during development
+        // in case it's been updated, and because there isn't a big advantage to doing so at the moment
+        if (manager.exists(geoPackageName)) {
+            manager.delete(geoPackageName);
         }
+        manager.importGeoPackage(geoPackageName, geoPackageFile);
+
         geopackage = manager.open(geoPackageName);
         if(geopackage!=null) {
             gpkgDb = geopackage.getConnection().getDb();
@@ -314,6 +338,12 @@ public class FeatureManager {
         return FALSE;
     }
 
+    public Boolean save()
+    {
+        String myParent = geoPackageFile.getParent();
+        manager.exportGeoPackage(geoPackageFile.getName(),new File(myParent));
+        return TRUE;
+    }
     public Point getGeoCenter() {
         return geoCenter;
     }
@@ -375,7 +405,7 @@ public class FeatureManager {
     public void addMediaTable(String layerName)
     {
         // If not exist...
-        String query = "CREATE TABLE IF NOT EXISTS 'media'" + layerName + " ( id INTEGER PRIMARY KEY AUTOINCREMENT, data BLOB NOT NULL, content_type TEXT NOT NULL )";
+        String query = "CREATE TABLE IF NOT EXISTS '" + layerName + "' ( id INTEGER PRIMARY KEY AUTOINCREMENT, data BLOB NOT NULL, content_type TEXT NOT NULL )";
         SQLiteDatabase sqliteDb = gpkgDb.getDb();
 
         sqliteDb.execSQL(query);
