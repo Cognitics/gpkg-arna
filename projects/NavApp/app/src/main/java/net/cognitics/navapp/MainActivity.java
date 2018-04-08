@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v13.app.ActivityCompat;
@@ -29,6 +30,7 @@ import com.karan.churi.PermissionManager.PermissionManager.statusArray;
 
 import android.view.View;
 import android.support.v7.app.AlertDialog;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static final int REQUEST_MEDIA_READ = 4;
     public static final int REQUEST_TAKE_PHOTO = 5;
     public static final int REQUEST_PICK_PHOTO = 6;
+    public static final int REQUEST_PREFERENCES = 7;
 
         public MainActivity() {
         //NULL
@@ -105,15 +108,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         //Toast.makeText(this, "onCreate()", Toast.LENGTH_LONG).show();
-        Button btn = (Button)findViewById(R.id.testButton);
+        ImageButton btn = (ImageButton)findViewById(R.id.action_settings);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ArrayList<RelatedTablesImageDialog.Row> rows = mViewModel.displayRelatedFeaturesTest();
-                Intent intent = new Intent(v.getContext(), RelatedTablesImageDialog.class);
-                intent.putExtra(RelatedTablesImageDialog.TITLE_TEXT, "CNP Relationships");
+                //ArrayList<RelatedTablesImageDialog.Row> rows = mViewModel.displayRelatedFeaturesTest();
+                Intent intent = new Intent(v.getContext(), SettingsActivity.class);
+                //intent.putExtra(RelatedTablesImageDialog.TITLE_TEXT, "CNP Relationships");
 
-                intent.putExtra(RelatedTablesImageDialog.PARCELABLE_ROWS, rows);
-                startActivityForResult(intent, CNP_RT_TEST_REQUEST);
+                //intent.putExtra(RelatedTablesImageDialog.PARCELABLE_ROWS, rows);
+                startActivityForResult(intent, REQUEST_PREFERENCES);
             }
         });
     }

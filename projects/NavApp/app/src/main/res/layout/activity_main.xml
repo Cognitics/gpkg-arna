@@ -9,8 +9,8 @@ tools:context="net.cognitics.navapp.MainActivity">
 
 <include layout="@layout/content_main" />
 
-    <Button
-        android:id="@+id/testButton"
+    <ImageButton
+        android:id="@+id/action_settings"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentBottom="true"
@@ -19,6 +19,6 @@ tools:context="net.cognitics.navapp.MainActivity">
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="19dp"
         android:layout_marginStart="19dp"
-        android:text="" />
+        android:src="@android:drawable/ic_menu_preferences" />
 
 </RelativeLayout>
