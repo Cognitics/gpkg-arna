@@ -7,11 +7,11 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.view.MenuItem;
@@ -24,9 +24,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -38,8 +36,10 @@ public class CustomGraphics extends View
     float pitch;
     public Context context;
     FrameLayout camera;
+    private Activity mainActivity;
+    //private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
     private HashMap<String,NavPoint> navMap=new HashMap<String,NavPoint>();
-    String mCurrentPhotoPath;
+
     public CustomGraphics(Context con)
     {
         super(con);
@@ -134,12 +134,8 @@ public class CustomGraphics extends View
         this.pitch=pitch;
     }
 
-    public void addPoint(FrameLayout camera, float bearing, float pitch, String id)
-    {
-        addPoint(camera,bearing,pitch,id,0,null);
-    }
 
-    public void addPoint(FrameLayout camera, float bearing, float pitch, String id, float distance, String title){
+    public void addPoint(FrameLayout camera, float bearing, float pitch, String id, float distance, String title, PointFeature feature){
 
         if(navMap.containsKey(id))
         {
@@ -159,48 +155,57 @@ public class CustomGraphics extends View
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
                                         public void onClick(View v) {
-                                            PopupMenu popupMenu = new PopupMenu(context,newPoint);
-                                            popupMenu.getMenuInflater().inflate(R.menu.navpoint_select,popupMenu.getMenu());
-                                            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                                public boolean onMenuItemClick(MenuItem item) {
-                                                    switch (item.getItemId()) {
-                                                        case R.id.snap:
-                                                            File newfile;
-                                                            try {
-                                                                newfile=createImageFile();
-                                                            }
-                                                            catch (IOException e)
-                                                            {
-                                                                //break;
-                                                            }
+                                            //Get the PointFeature associated with this NavPoint
+                                            //We can use this to attach a new photo
+                                            PointFeature pt = (PointFeature)v.getTag();
+                                            if(pt==null)
+                                            {
+                                                // The NavPoint for the waypoint will be null
+                                            }
+                                            else {
 
-                                                            //Uri outputFileUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".my.package.name.provider", newfile);
+                                                PopupMenu popupMenu = new PopupMenu(context, newPoint);
+                                                popupMenu.getMenuInflater().inflate(R.menu.navpoint_select, popupMenu.getMenu());
+                                                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                                    public boolean onMenuItemClick(MenuItem item) {
+                                                        switch (item.getItemId()) {
+                                                            case R.id.snap:
+                                                                String file = "Picturetest.jpg";
+                                                                File newfile = new File(file);
+                                                                try {
+                                                                    newfile.createNewFile();
+                                                                } catch (IOException e) {
+                                                                }
 
-                                                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                                            //cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-                                                            cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                                            ((Activity)context).startActivityForResult(cameraIntent, 0);
-                                                            break;
+                                                                Uri outputFileUri = Uri.fromFile(newfile);
 
-                                                        case R.id.select:
-                                                            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                                                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                                            // Start the Intent
-                                                            ((Activity)context).startActivityForResult(galleryIntent, 0);
-                                                            break;
+                                                                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                                                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+                                                                ((Activity) context).startActivityForResult(cameraIntent, MainActivity.REQUEST_TAKE_PHOTO);
+                                                                break;
+
+                                                            case R.id.select:
+                                                                Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                                                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                                                // Start the Intent
+                                                                ((Activity) context).startActivityForResult(galleryIntent, MainActivity.REQUEST_PICK_PHOTO);
+                                                                break;
 
 
-                                                        default:
-                                                            break;
+                                                            default:
+                                                                break;
 
+                                                        }
+                                                        return true;
                                                     }
-                                                    return true;
-                                                }
-                                            });
-                                            popupMenu.show();
+                                                });
+                                                popupMenu.show();
+                                            }
                                         }
                                     });
 
+        newPoint.setTag(feature);
         navMap.put(id,newPoint);
         camera.addView(newPoint);
         newPoint.setDistance((int)distance);
@@ -225,20 +230,5 @@ public class CustomGraphics extends View
         navMap.clear();
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }
 }
