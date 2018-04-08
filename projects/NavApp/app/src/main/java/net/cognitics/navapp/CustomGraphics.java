@@ -155,6 +155,7 @@ public class CustomGraphics extends View
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
                                         public void onClick(View v) {
+<<<<<<< HEAD
                                             //Get the PointFeature associated with this NavPoint
                                             //We can use this to attach a new photo
                                             PointFeature pt = (PointFeature)v.getTag();
@@ -198,6 +199,42 @@ public class CustomGraphics extends View
 
                                                         }
                                                         return true;
+=======
+                                            PopupMenu popupMenu = new PopupMenu(context,newPoint);
+                                            popupMenu.getMenuInflater().inflate(R.menu.navpoint_select,popupMenu.getMenu());
+                                            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                                public boolean onMenuItemClick(MenuItem item) {
+                                                    switch (item.getItemId()) {
+                                                        case R.id.snap:
+                                                            String file = "Picturetest.jpg";
+                                                            File newfile = new File(file);
+                                                            try {
+                                                                newfile.createNewFile();
+                                                            }
+                                                            catch (IOException e)
+                                                            {
+                                                            }
+
+                                                            Uri outputFileUri = Uri.fromFile(newfile);
+
+                                                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                                            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+                                                            ((Activity)context).startActivityForResult(cameraIntent, 0);
+                                                            break;
+
+                                                        case R.id.select:
+                                                            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                                                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                                            // Start the Intent
+                                                            ((Activity)context).startActivityForResult(galleryIntent, 0);
+                                                            break;
+
+
+                                                        default:
+                                                            break;
+
+>>>>>>> parent of 1c5ea4e... Fixing support for taking pictures, needs a little work to actually save them
                                                     }
                                                 });
                                                 popupMenu.show();
