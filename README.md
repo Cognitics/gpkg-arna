@@ -1,6 +1,8 @@
 # gpkg-arna
 Augmented Reality Navigation Assistance Using GeoPackage
 
+__DEADLINE: APRIL 15TH__
+
 # Requirements for the app:
 
  - **Software builds and installs according to supplied instructions** <a href="#note1" id="note1ref"><sup>1</sup></a>
@@ -18,6 +20,6 @@ Augmented Reality Navigation Assistance Using GeoPackage
 
  <a id="note1" href="#note1ref"><sup>1</sup></a>Top priority functionality required for prize award)
 
-![Mockup Main Screen] (./main_screen_mockup.png)
+# Mockup of main screen
+<img src="/main_screen_mockup.png"/>
 
-__DEADLINE: APRIL 15TH__
