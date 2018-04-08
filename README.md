@@ -23,3 +23,5 @@ __DEADLINE: APRIL 15TH__
 # Mockup of main screen
 <img src="/main_screen_mockup.png"/>
 
+# Mockup of settings screen
+<img src="/settings.png"/>
