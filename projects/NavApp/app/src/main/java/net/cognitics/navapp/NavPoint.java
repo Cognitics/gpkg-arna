@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 public class NavPoint extends AppCompatImageButton{
     private float bearing,pitch;
+    private int distance=1;
     private TextView textView;
 
     public NavPoint(Context context) {
@@ -40,6 +41,14 @@ public class NavPoint extends AppCompatImageButton{
 
     public float getBearing(){
         return bearing;
+    }
+    public void setDistance(int distance){
+        if (distance>0) {
+            this.distance = distance;
+        }
+    }
+    public int getDistance(){
+        return distance;
     }
     public float getPitch(){
         return pitch;

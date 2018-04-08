@@ -78,7 +78,14 @@ public class CustomGraphics extends View
             }else {
                 tX += 12 * ((n.getBearing()) - (bearing));
             }
-            tY-=16*(n.getPitch()-(pitch));
+
+            int spread = 30; //Hardcoded currently, should be set as a representation of the spread of the route's distance
+            int pRatio = ((spread*(1000/((n.getDistance())+1)))-(spread*2));
+            if (pRatio>120){
+                pRatio=120;
+            }
+
+            tY-=16*(n.getPitch()-(pitch))-pRatio;
 
 
             //Keep on screen if out of screen
@@ -129,7 +136,8 @@ public class CustomGraphics extends View
         if(navMap.containsKey(id))
         {
             if(title!=null)
-                navMap.get(id).getText().setText(String.format("%s: %.3fkm",title,distance/1000.0));
+                navMap.get(id).getText().setText(String.format("%s:\n %.3fkm",title,distance/1000.0));
+                navMap.get(id).setDistance((int)distance);
             updatePoint(bearing,pitch,id);
             return;
         }
@@ -143,7 +151,6 @@ public class CustomGraphics extends View
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
                                         public void onClick(View v) {
-                                            Toast.makeText(context, "Hello World", Toast.LENGTH_LONG).show();
                                             PopupMenu popupMenu = new PopupMenu(context,newPoint);
                                             popupMenu.getMenuInflater().inflate(R.menu.navpoint_select,popupMenu.getMenu());
                                             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -188,9 +195,10 @@ public class CustomGraphics extends View
 
         navMap.put(id,newPoint);
         camera.addView(newPoint);
+        newPoint.setDistance((int)distance);
         camera.addView(newPoint.getText());
         if(title!=null)
-            navMap.get(id).getText().setText(String.format("%s: %.3fkm",title,distance/1000.0));
+            navMap.get(id).getText().setText(String.format("%s:\n %.3fkm",title,distance/1000.0));
     }
 
     public void updatePoint(float bearing, float pitch, String id)
