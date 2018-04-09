@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -12,6 +13,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.Image;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v13.app.ActivityCompat;
@@ -37,6 +39,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.prefs.Preferences;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -83,6 +87,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static final int REQUEST_PICK_PHOTO = 6;
     public static final int REQUEST_PREFERENCES = 7;
 
+
+    public static Boolean route_from_start = TRUE;
+    public static Boolean display_cnp_photos = TRUE;
+    public static Boolean group_cnp_icons = TRUE;
+    public static Boolean display_poi = TRUE;
+    public static float cnp_arrival_distance = 10;
+    public static float cnp_off_route_distance = 25;
+
         public MainActivity() {
         //NULL
     }
@@ -119,6 +131,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 startActivityForResult(intent, REQUEST_PREFERENCES);
             }
         });
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //Map<String,?> allprefs = preferences.getAll();
+        route_from_start = preferences.getBoolean("route_from_start",TRUE);
+        display_cnp_photos = preferences.getBoolean("display_cnp_photos",TRUE);
+        group_cnp_icons = preferences.getBoolean("group_cnp_icons",TRUE);
+        display_poi = preferences.getBoolean("display_poi",TRUE);
+        cnp_off_route_distance = Float.parseFloat(preferences.getString("cnp_off_route_distance","25"));
+        cnp_arrival_distance = Float.parseFloat(preferences.getString("cnp_arrival_distance","10"));
     }
 
     /*
@@ -185,6 +206,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         else if((requestCode==REQUEST_PICK_PHOTO) && resultCode==Activity.RESULT_OK) {
 
+        }
+        // We don't check resultCode for preferences since there is only back/cancel to get out
+        else if(requestCode==REQUEST_PREFERENCES) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            //Map<String,?> allprefs = preferences.getAll();
+            route_from_start = preferences.getBoolean("route_from_start",TRUE);
+            display_cnp_photos = preferences.getBoolean("display_cnp_photos",TRUE);
+            group_cnp_icons = preferences.getBoolean("group_cnp_icons",TRUE);
+            display_poi = preferences.getBoolean("display_poi",TRUE);
+            cnp_off_route_distance = Float.parseFloat(preferences.getString("cnp_off_route_distance","25"));
+            cnp_arrival_distance = Float.parseFloat(preferences.getString("cnp_arrival_distance","10"));
         }
     }
 

@@ -183,13 +183,14 @@ public class RouteManager {
             return;
 
         // The distance you are allowed to be off the route before it puts you on a path to the nearest point on the route from your current location
-        final double OFF_ROUTE_DISTANCE = 15;
-        double SNAP_DISTANCE = 15;
         int numPoints = currentRoute.size();
         if(numPoints<2)
             return;
 
-        double distanceToSegment = OFF_ROUTE_DISTANCE;
+        double testValue = 0;
+        //context.getSharedPreferences()
+        //.getFloat("cnp_off_route_distance");
+        double distanceToSegment;
         if(nextIndex==0) {
             double closestSegmentDistance = Double.MAX_VALUE;
             // Special case when starting a route...find the nearest segment to the current position and set the route there,
@@ -208,7 +209,7 @@ public class RouteManager {
         }
         else
             distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex-1),currentRouteUTM.get(nextIndex));
-        if(distanceToSegment > OFF_ROUTE_DISTANCE) {
+        if(distanceToSegment > MainActivity.cnp_off_route_distance) {
             offRoute = TRUE;
             if(nextIndex==0)
                 routeInterceptPoint = findInterceptPoint(currentRouteUTM.get(nextIndex), currentRouteUTM.get(nextIndex + 1), currentPositionUTM);
@@ -234,7 +235,7 @@ public class RouteManager {
         for(int i=nextIndex;i<numPoints;i++)
         {
             double vertDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(i));
-            if(vertDistance < SNAP_DISTANCE)
+            if(vertDistance < MainActivity.cnp_arrival_distance)
             {
                 snappedToVert = TRUE;
                 currentDistance = vertDistance;

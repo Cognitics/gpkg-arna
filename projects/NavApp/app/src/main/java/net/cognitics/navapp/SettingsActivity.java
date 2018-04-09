@@ -69,12 +69,13 @@ public class SettingsActivity extends PreferenceActivity {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
+
+        //preference.g
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+        //sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+        //       PreferenceManager.getDefaultSharedPreferences(preference.getContext());
+                       //preference.getContext()).getBoolean(preference.getKey(), ""));
     }
 
     @Override
