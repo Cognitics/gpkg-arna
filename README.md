@@ -21,7 +21,7 @@ __DEADLINE: APRIL 15TH__
  <a id="note1" href="#note1ref"><sup>1</sup></a>Top priority functionality required for prize award)
 
 # Mockup of main screen
-<img src="/main_screen_mockup.png"/>
+<img src="/docs/main_screen_mockup.png"/>
 
 # Mockup of settings screen
-<img src="/settings.png"/>
+<img src="/docs/settings.png"/>
