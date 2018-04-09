@@ -209,7 +209,7 @@ public class RouteManager {
         }
         else
             distanceToSegment = pointToSegmentDistance(currentPositionUTM,currentRouteUTM.get(nextIndex-1),currentRouteUTM.get(nextIndex));
-        if(distanceToSegment > MainActivity.cnp_off_route_distance) {
+        if(distanceToSegment > MainActivity.prefCNPOffRouteDistance) {
             offRoute = TRUE;
             if(nextIndex==0)
                 routeInterceptPoint = findInterceptPoint(currentRouteUTM.get(nextIndex), currentRouteUTM.get(nextIndex + 1), currentPositionUTM);
@@ -235,7 +235,7 @@ public class RouteManager {
         for(int i=nextIndex;i<numPoints;i++)
         {
             double vertDistance = pointToPointDistance(currentPositionUTM,currentRouteUTM.get(i));
-            if(vertDistance < MainActivity.cnp_arrival_distance)
+            if(vertDistance < MainActivity.prefCNPArrivalDistance)
             {
                 snappedToVert = TRUE;
                 currentDistance = vertDistance;
