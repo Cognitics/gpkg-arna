@@ -211,7 +211,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if(requestCode==REQUEST_PREFERENCES) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             //Map<String,?> allprefs = preferences.getAll();
-            route_from_start = preferences.getBoolean("route_from_start",TRUE);
+            Boolean new_route_from_start = preferences.getBoolean("route_from_start",TRUE);
+            if(route_from_start!=new_route_from_start) {
+                Toast.makeText(this, "Reload the route to restart navigation.", Toast.LENGTH_LONG).show();
+            }
+            route_from_start = new_route_from_start;
             display_cnp_photos = preferences.getBoolean("display_cnp_photos",TRUE);
             group_cnp_icons = preferences.getBoolean("group_cnp_icons",TRUE);
             display_poi = preferences.getBoolean("display_poi",TRUE);
