@@ -340,8 +340,13 @@ public class FeatureManager {
 
     public Boolean save()
     {
-        String myParent = geoPackageFile.getParent();
-        manager.exportGeoPackage(geoPackageFile.getName(),new File(myParent));
+        try {
+            String myParent = geoPackageFile.getParent();
+            manager.exportGeoPackage(geoPackageFile.getName(), new File(myParent));
+        }
+        catch (mil.nga.geopackage.GeoPackageException ex) {
+            Toast.makeText(context,"Unable to save GeoPackage. This session will be read-only.",Toast.LENGTH_LONG);
+        }
         return TRUE;
     }
     public Point getGeoCenter() {
