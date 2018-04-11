@@ -41,6 +41,7 @@ public class RouteManager {
 
     private Boolean offRoute = FALSE;
     private Point routeInterceptPoint;
+    private Boolean autoRouteMode = TRUE;//If false, waypoints have to be set manually
 
     private void updateRoute()
     {
@@ -48,8 +49,10 @@ public class RouteManager {
         {
             if(currentPositionGeo==null || currentPositionUTM==null)
                 return;
+            if(autoRouteMode) {
             // gets the point and the distance
-            calculateNearestLinePointGeo();
+                calculateNearestLinePointGeo();
+            }
             //Calculate the bearing after the next best point is found
             calculateNearestBearing();
             needsUpdate = FALSE;
@@ -265,16 +268,49 @@ public class RouteManager {
 
     }
 
+    public Boolean rewindRoutePoint()
+    {
+        if(nextIndex==0)
+            return FALSE;
+        nextIndex -= 1;
+        return TRUE;
+    }
+    public Boolean advanceRoutePoint()
+    {
+        if((nextIndex+1) >= currentRoute.size())
+            return FALSE;
+        nextIndex += 1;
+        return TRUE;
+    }
+    // If returns the next waypoint. If in autoroute mode, this will be either the next navigation
+    // point along the route, or the nearest intercept point along that route.
+    // When autoroute is disabled, this will be the current waypoint selected bby the user.
+    private Point getCurrentWaypoint()
+    {
+        if(currentRoute.size() < 2)
+            return null;
+        if(this.autoRouteMode) {
+            if(nextIndex >= 0 && nextIndex <  currentRoute.size()) {
+                 if(!offRoute || (routeInterceptPoint!=null))
+                    return currentRoute.get(nextIndex);
+                 else
+                     return routeInterceptPoint;
+
+            }
+            else {
+                return currentRoute.get(currentRoute.size()-1);
+            }
+        }
+
+        return currentRoute.get(nextIndex);
+
+    }
     private void calculateNearestBearing()
     {
         if(currentPositionGeo==null || currentPositionUTM==null || currentRoute.size()<2)
             return;
-        if(!offRoute || (routeInterceptPoint!=null))
-        {
-            currentBearing = GreatCircle.getBearing(currentPositionGeo,currentRoute.get(nextIndex));
-        }
-        else
-            currentBearing = GreatCircle.getBearing(currentPositionGeo,routeInterceptPoint);
+        Point nextPoint = getCurrentWaypoint();
+        currentBearing = GreatCircle.getBearing(currentPositionGeo,nextPoint);
     }
 
     //Get the geographic coordinates nearest the current position
