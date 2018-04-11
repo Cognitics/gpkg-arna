@@ -33,6 +33,7 @@ import com.karan.churi.PermissionManager.PermissionManager.statusArray;
 import android.view.View;
 import android.support.v7.app.AlertDialog;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -202,7 +203,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         }
         else if((requestCode==REQUEST_TAKE_PHOTO) && resultCode==Activity.RESULT_OK) {
-
+            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mImageView.setImageBitmap(imageBitmap);
         }
         else if((requestCode==REQUEST_PICK_PHOTO) && resultCode==Activity.RESULT_OK) {
 

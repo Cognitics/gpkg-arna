@@ -7,17 +7,6 @@ android:layout_height="match_parent"
 tools:context="net.cognitics.navapp.MainActivity">
 
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="104dp"
-        android:layout_height="104dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <include layout="@layout/content_main" />
 
     <ImageButton
@@ -47,7 +36,7 @@ tools:context="net.cognitics.navapp.MainActivity">
         android:id="@+id/showImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageView3"
+        android:layout_above="@+id/imageButton"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:background="@null"
@@ -57,7 +46,7 @@ tools:context="net.cognitics.navapp.MainActivity">
         android:id="@+id/autoNav"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageView3"
+        android:layout_alignTop="@+id/nextNav"
         android:layout_centerHorizontal="true"
         android:background="@null"
         app:srcCompat="@android:drawable/ic_media_play" />
@@ -66,10 +55,21 @@ tools:context="net.cognitics.navapp.MainActivity">
         android:id="@+id/nextNav"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/autoNav"
+        android:layout_above="@+id/showImage"
+        android:layout_marginBottom="16dp"
         android:layout_toEndOf="@+id/autoNav"
         android:layout_toRightOf="@+id/autoNav"
         android:background="@null"
         app:srcCompat="@android:drawable/ic_media_ff" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        app:srcCompat="@drawable/cnpicon"
+        android:background="@null"/>
 
 </RelativeLayout>
