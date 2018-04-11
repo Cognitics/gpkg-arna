@@ -171,7 +171,7 @@ public class CustomGraphics extends View
                                                     public boolean onMenuItemClick(MenuItem item) {
                                                         switch (item.getItemId()) {
                                                             case R.id.snap:
-                                                                String file = "Picturetest.jpg";
+                                                                /*String file = "Picturetest.jpg";
                                                                 File newfile = new File(file);
                                                                 try {
                                                                     newfile.createNewFile();
@@ -184,6 +184,11 @@ public class CustomGraphics extends View
                                                                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
                                                                 ((Activity) context).startActivityForResult(cameraIntent, MainActivity.REQUEST_TAKE_PHOTO);
+                                                                */
+                                                                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                                                if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
+                                                                    ((Activity)context).startActivityForResult(takePictureIntent, 5);
+                                                                }
                                                                 break;
 
                                                             case R.id.select:
