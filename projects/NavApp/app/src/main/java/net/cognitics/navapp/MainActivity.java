@@ -89,12 +89,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static final int REQUEST_PREFERENCES = 7;
 
 
-    public static Boolean route_from_start = TRUE;
-    public static Boolean display_cnp_photos = TRUE;
-    public static Boolean group_cnp_icons = TRUE;
-    public static Boolean display_poi = TRUE;
-    public static float cnp_arrival_distance = 10;
-    public static float cnp_off_route_distance = 25;
+    public static Boolean prefRouteFromStart = TRUE;
+    public static Boolean prefDisplayCNPPhotos = TRUE;
+    public static Boolean prefGroupCNPMarkers = TRUE;
+    public static Boolean prefDisplayPOI = TRUE;
+    public static float prefCNPArrivalDistance = 10;
+    public static float prefCNPOffRouteDistance = 25;
 
         public MainActivity() {
         //NULL
@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //Map<String,?> allprefs = preferences.getAll();
-        route_from_start = preferences.getBoolean("route_from_start",TRUE);
-        display_cnp_photos = preferences.getBoolean("display_cnp_photos",TRUE);
-        group_cnp_icons = preferences.getBoolean("group_cnp_icons",TRUE);
-        display_poi = preferences.getBoolean("display_poi",TRUE);
-        cnp_off_route_distance = Float.parseFloat(preferences.getString("cnp_off_route_distance","25"));
-        cnp_arrival_distance = Float.parseFloat(preferences.getString("cnp_arrival_distance","10"));
+        prefRouteFromStart = preferences.getBoolean("route_from_start",TRUE);
+        prefDisplayCNPPhotos = preferences.getBoolean("display_cnp_photos",TRUE);
+        prefGroupCNPMarkers = preferences.getBoolean("group_cnp_icons",TRUE);
+        prefDisplayPOI = preferences.getBoolean("display_poi",TRUE);
+        prefCNPOffRouteDistance = Float.parseFloat(preferences.getString("cnp_off_route_distance","25"));
+        prefCNPArrivalDistance = Float.parseFloat(preferences.getString("cnp_arrival_distance","10"));
     }
 
     /*
@@ -215,16 +215,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if(requestCode==REQUEST_PREFERENCES) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             //Map<String,?> allprefs = preferences.getAll();
-            Boolean new_route_from_start = preferences.getBoolean("route_from_start",TRUE);
-            if(route_from_start!=new_route_from_start) {
+            Boolean new_prefRouteFromStart = preferences.getBoolean("route_from_start",TRUE);
+            if(prefRouteFromStart!=new_prefRouteFromStart) {
                 Toast.makeText(this, "Reload the route to restart navigation.", Toast.LENGTH_LONG).show();
             }
-            route_from_start = new_route_from_start;
-            display_cnp_photos = preferences.getBoolean("display_cnp_photos",TRUE);
-            group_cnp_icons = preferences.getBoolean("group_cnp_icons",TRUE);
-            display_poi = preferences.getBoolean("display_poi",TRUE);
-            cnp_off_route_distance = Float.parseFloat(preferences.getString("cnp_off_route_distance","25"));
-            cnp_arrival_distance = Float.parseFloat(preferences.getString("cnp_arrival_distance","10"));
+            prefRouteFromStart = new_prefRouteFromStart;
+            prefDisplayCNPPhotos = preferences.getBoolean("display_cnp_photos",TRUE);
+            prefGroupCNPMarkers = preferences.getBoolean("group_cnp_icons",TRUE);
+            prefDisplayPOI = preferences.getBoolean("display_poi",TRUE);
+            prefCNPOffRouteDistance = Float.parseFloat(preferences.getString("cnp_off_route_distance","25"));
+            prefCNPArrivalDistance = Float.parseFloat(preferences.getString("cnp_arrival_distance","10"));
         }
     }
 
