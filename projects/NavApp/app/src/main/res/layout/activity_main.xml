@@ -49,7 +49,7 @@ tools:context="net.cognitics.navapp.MainActivity">
         android:layout_alignTop="@+id/nextNav"
         android:layout_centerHorizontal="true"
         android:background="@null"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@android:drawable/ic_media_pause" />
 
     <ImageButton
         android:id="@+id/nextNav"
