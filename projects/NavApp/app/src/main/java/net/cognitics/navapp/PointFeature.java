@@ -33,11 +33,14 @@ public class PointFeature {
     //attributes (key/value pairs, stored as a dictionary)
     private Map<String, String> attributes;
 
+    private byte[] relatedBitmap;
+
+/*
     // Vertices for opengl rendering
     // Buffer for vertex-array
     private FloatBuffer vertexBuffer;
     // Buffer for index-array
-    private ByteBuffer indexBuffer;
+    private ByteBuffer indexBuffer;*/
 
     PointFeature(WGS84 geoCoordinates, int fid, String layerName)
     {
@@ -46,10 +49,17 @@ public class PointFeature {
         this.geoCoordinates = new WGS84(geoCoordinates.getLatitude(),geoCoordinates.getLongitude());
         // Project to UTM
         utmCoordinates = new UTM(geoCoordinates);
-
-        // todo: Generate a diamond or something to act as a placemark
     }
 
+    public String getRelatedMedia()
+    {
+        //ArrayList<RelatedTablesRelationship> relationships = GeoPackageRelatedTables
+        return "xxx";
+    }
+
+    public void setRelatedBitmap(byte[] blob) {
+        relatedBitmap = blob;
+    }
     public String getAttribute(String attributeName)
     {
         if(attributes.containsKey(attributeName))
@@ -93,11 +103,11 @@ public class PointFeature {
     public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
     }
-
+/*
     public void render(GL10 gl)
     {
 
-    }
+    }*/
 
     /**
      *  Returns the bearing from a specified point to this point feature

@@ -268,6 +268,10 @@ public class FeatureManager {
                             feature.setAttributes(attributes);
                             if (table.startsWith("cnp_")) {
                                 cnpFeatures.add(feature);
+                                if(cnpRelationships.size()>0) {
+                                    ArrayList<Integer> fids = relatedTablesManager.getRelatedFIDs(cnpRelationships.get(0),fid);
+
+                                }
                             } else if (table.startsWith("poi_")) {
                                 poiPointFeatures.add(feature);
                             } else if (table.startsWith("aoi_")) {
@@ -351,6 +355,14 @@ public class FeatureManager {
     }
     public Point getGeoCenter() {
         return geoCenter;
+    }
+
+    // create an inner class for related media
+    // fid, byte array, content type, relationship....?
+    public void getRelatedMedia(PointFeature feature) {
+        // get the relationships for this table this feature belongs to (read this up front, keep a hashmap of tables to array of Relationships
+        // find the list of fids related to this feature
+        // return the data for the first one.
     }
 
     public ArrayList<RelatedTablesImageDialog.Row> relatedFeaturesTest() {

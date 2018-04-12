@@ -124,11 +124,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ImageButton btn = (ImageButton) findViewById(R.id.action_settings);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //ArrayList<RelatedTablesImageDialog.Row> rows = mViewModel.displayRelatedFeaturesTest();
                 Intent intent = new Intent(v.getContext(), SettingsActivity.class);
-                //intent.putExtra(RelatedTablesImageDialog.TITLE_TEXT, "CNP Relationships");
-
-                //intent.putExtra(RelatedTablesImageDialog.PARCELABLE_ROWS, rows);
                 startActivityForResult(intent, REQUEST_PREFERENCES);
             }
         });

@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import mil.nga.wkb.geom.Point;
 
@@ -43,6 +44,51 @@ public class RouteManager {
     private Boolean offRoute = FALSE;
     private Point routeInterceptPoint;
     private Boolean autoRouteMode = TRUE;//If false, waypoints have to be set manually
+    // This maps an index into the route to a Point feature (CNP)
+    // The association is made by finding the closest vert in the route
+    // to each CNP. There is a field in the sample data that has an id
+    // which might be doing the same thing, but instead of assuming that it is,
+    // we'll just use distance.
+    private Map<Integer,PointFeature> criticalNavigationPoints;
+
+    // each route vert will end up with an association of the closest CNP (only one)
+    public void associateCriticalNavigationPoints(ArrayList<PointFeature> points)
+    {
+        if(points.size()==0)
+            return;
+
+        for(int i=0;i<currentRouteUTM.size();i++) {
+            int closestIdx = 0;
+            PointFeature closestCNP = points.get(0);
+            double closestDistance = Double.MAX_VALUE;
+            for(int j=0;j<points.size();j++) {
+                PointFeature cnp = points.get(j);
+                Point cnpPoint = new Point(cnp.getUtmCoordinates().getEasting(), cnp.getUtmCoordinates().getNorthing());
+                double dist = pointToPointDistance(currentRouteUTM.get(i),cnpPoint);
+                if(dist < closestDistance) {
+                    closestDistance = dist;
+                    closestIdx = i;
+                    closestCNP = cnp;
+                }
+            }
+            criticalNavigationPoints.put(closestIdx,closestCNP);
+        }
+    }
+
+    /**
+     * Gets the nearest CNP associated with the current position on the route.
+     * @return
+     */
+    public PointFeature getCurrentCNP()
+    {
+        if(criticalNavigationPoints.containsKey(nextIndex)) {
+            return criticalNavigationPoints.get(nextIndex);
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     RouteManager(ArrayList<Point> route, HashMap<String, String> attributes, int fid, Context context) {
         currentRouteUTM = new ArrayList<Point>();
@@ -54,7 +100,7 @@ public class RouteManager {
         this.attributes = attributes;
         this.fid = fid;
         this.context = context;
-
+        criticalNavigationPoints = new HashMap<>();
     }
 
     public Boolean getAutoRouteMode() {
@@ -186,8 +232,7 @@ public class RouteManager {
             return;
 
         double testValue = 0;
-        //context.getSharedPreferences()
-        //.getFloat("cnp_off_route_distance");
+
         double distanceToSegment;
         if (nextIndex == 0 && !MainActivity.prefRouteFromStart) {
             double closestSegmentDistance = Double.MAX_VALUE;
