@@ -7,26 +7,17 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 public class CustomGraphics extends View
 {
@@ -39,11 +30,14 @@ public class CustomGraphics extends View
     private Activity mainActivity;
     //private ArrayList<NavPoint> navList=new ArrayList<NavPoint>();
     private HashMap<String,NavPoint> navMap=new HashMap<String,NavPoint>();
-
+    private ArrayList<NavLine> lineList = new ArrayList<NavLine>();
+    Paint paint = new Paint();
     public CustomGraphics(Context con)
+
     {
         super(con);
         this.context=con;
+        paint.setColor(Color.WHITE);
     }
 
     public CustomGraphics(Context con, AttributeSet set)
@@ -59,6 +53,28 @@ public class CustomGraphics extends View
     @Override
     protected void onDraw(Canvas c)
     {
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(10);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        for (NavLine n : lineList){
+            if (n.getPoints()!=null){
+                NavPoint p1=n.getPoints()[0];
+                NavPoint p2=n.getPoints()[1];
+            if (p1!=null&&p2!=null) {
+
+                if ((p1.getX()>0&&p1.getX()<camera.getWidth()-p1.getWidth())&&(p2.getX()>0&&p2.getX()<camera.getWidth()-p2.getWidth()))
+                {
+
+
+                    c.drawLine(p1.getX() + (p1.getWidth() / 2), p1.getY() + (p1.getHeight() / 2), p2.getX() + (p2.getWidth() / 2), p2.getY() + (p2.getHeight() / 2), paint);
+                }
+            }else if (n.getPoints()!=null&&p1!=null) {
+                if (p1.getX()>0&&p1.getX()<camera.getWidth()-p1.getWidth()){
+                c.drawLine(p1.getX() + (p1.getWidth() / 2), p1.getY() + (p1.getHeight() / 2), camera.getMeasuredWidth() / 2, camera.getMeasuredHeight(), paint);
+            }
+            }
+            }
+        }
     }
 
 
@@ -97,6 +113,20 @@ public class CustomGraphics extends View
 
 
             //Keep on screen if out of screen
+
+            if (tX<0){
+                //CASE: Off screen to left
+                //tY-=tX; //TOO CONFUSING?
+                tX=0;
+                showText=false;
+
+            }else if (tX>width-n.getWidth()){
+                //CASE: Off screen to right
+                //tY+=tX-n.getWidth();
+                tX=width-(n.getWidth());
+                showText=false;
+
+            }
             if (tY<0){
                 //CASE: Off screen up
                 tY=0;
@@ -106,16 +136,6 @@ public class CustomGraphics extends View
                 tY=height-(n.getHeight());
                 showText=false;
             }
-            if (tX<0){
-                //CASE: Off screen to left
-                tX=0;
-                showText=false;
-            }else if (tX>width-n.getWidth()){
-                //CASE: Off screen to right
-                tX=width-(n.getWidth());
-                showText=false;
-            }
-
             //Apply X and Y
             if (showText){
                 text.setVisibility(View.VISIBLE);
@@ -125,6 +145,7 @@ public class CustomGraphics extends View
             n.setX((float)tX);
             n.setY((float)tY);
         }
+        invalidate();
 
     }
 
@@ -228,6 +249,13 @@ public class CustomGraphics extends View
             navMap.get(id).getText().setText(String.format("%s:\n %.3fkm",title,distance/1000.0));
     }
 
+    public void addLine(NavPoint navOne, NavPoint navtwo){
+        lineList.add(new NavLine(navOne,navtwo));
+    }
+    public void clearLines(){
+        lineList.clear();
+    }
+
     public void updatePoint(float bearing, float pitch, String id)
     {
         if(navMap.containsKey(id))
@@ -242,6 +270,9 @@ public class CustomGraphics extends View
             camera.removeView(v);
         }
         navMap.clear();
+    }
+    public NavPoint getPoint(String id){
+        return navMap.get(id);
     }
 
 

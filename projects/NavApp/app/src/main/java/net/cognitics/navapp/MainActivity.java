@@ -35,6 +35,7 @@ import android.support.v7.app.AlertDialog;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         cameraPreview = (FrameLayout) findViewById(R.id.cameraPreview);
         showCamera = new ShowCamera(this, camera);
         cameraPreview.addView(showCamera);
-
+        ((RelativeLayout)findViewById(R.id.rLayout)).addView(mViewModel.getCustomGraphics());
+        mViewModel.getCustomGraphics().bringToFront();
         //Bring constraint layout to front
         ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.Constraint);
         constraintLayout.bringToFront();
@@ -390,9 +392,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_GAME);
+                SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_GAME);
+                SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -481,6 +483,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
                 }
             }
+
+
+            //customGraphics.invalidate();
+
+
+
             RouteManager rm = mViewModel.getRouteManager();
             if (rm != null) {
                 rm.setCurrentPositionAndBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation(), bearing);
@@ -492,6 +500,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
                 customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "*", null);
+                customGraphics.addLine(customGraphics.getPoint("route_point"),null);
                 customGraphics.updatePositions();
                 PointFeature cnp = rm.getCurrentCNP();
             }
