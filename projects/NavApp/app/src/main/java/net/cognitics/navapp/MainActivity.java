@@ -517,21 +517,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 PointFeature cnp = rm.getCurrentCNP();
                 int cnpID = rm.getCurrentCNPID();
                 if(mViewModel.currentCNPID!=cnpID || mViewModel.cnpImage==null) {
+                    mViewModel.currentCNPID=cnpID;
+                    Log.d("NAVAPP","Switching CNP IDs");
                     // get image bitmap from cnp
                     ArrayList<RelatedTablesRelationship> relationships = mViewModel.getFeatureManager().getRelatedTablesManager().getRelationships(cnp.getLayerName());
+                    ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
                     if(relationships.size()>0) {
                         //We're only going to use specific content types
-                        ArrayList<FeatureManager.FeatureMedia> jpgMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/jpg",cnp.getFid());
+                        ArrayList<FeatureManager.FeatureMedia> jpgMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/jpeg",cnp.getFid());
                         ArrayList<FeatureManager.FeatureMedia> pngMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/png",cnp.getFid());
                         ArrayList<FeatureManager.FeatureMedia> mediaBlobs = new ArrayList<>();
                         mediaBlobs.addAll(jpgMediaBlobs);
                         mediaBlobs.addAll(pngMediaBlobs);
                         if(mediaBlobs.size()>0) {
+                            Log.d("NAVAPP","Getting new media");
                             // get a bitmap
                             ByteArrayInputStream is = new ByteArrayInputStream(mediaBlobs.get(0).blob); //stream pointing to your blob or file
-                            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
                             mViewModel.cnpImage = BitmapFactory.decodeStream(is);
                             if(mViewModel.cnpImage!=null) {
+                                Log.d("NAVAPP","Enabling CNP image");
                                 mImageView.setImageBitmap(mViewModel.cnpImage);
                                 mImageView.setVisibility(View.VISIBLE);
                             }
@@ -539,6 +543,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 mImageView.setVisibility(View.INVISIBLE);
                             }
                         }
+                        else {
+                            mImageView.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                    else {
+                        mImageView.setVisibility(View.INVISIBLE);
                     }
                 }
                 double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());

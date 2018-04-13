@@ -395,7 +395,18 @@ public class FeatureManager {
     public ArrayList<FeatureMedia> getMediaBlobs(ArrayList<RelatedTablesRelationship> relationships, String contentType, int featureFid) {
         ArrayList<FeatureMedia> mediaArrayList = new ArrayList<>();
         for(RelatedTablesRelationship relationship : relationships) {
-            String queryString = String.format(Locale.US ,"select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d AND content_type='%s'",
+            //select * from photos left join cnp_tampa_photos on cnp_tampa_photos.related_id=photos.id where cnp_tampa_photos.base_id=4 AND content_type='image/jpeg'
+            String queryString = String.format("select * from %s left join %s on %s.related_id=%s.%s where %s.base_id=%d AND content_type='%s'",
+                    relationship.relatedTableName,
+                    relationship.mappingTableName,
+                    relationship.mappingTableName,
+                    relationship.relatedTableName,
+                    relationship.relatedTableColumn,
+                    relationship.mappingTableName,
+                    featureFid,
+                    contentType);
+
+            /*String queryString = String.format(Locale.US ,"select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d AND content_type='%s'",
                     relationship.relatedTableName,
                     relationship.baseTableName,
                     relationship.baseTableColumn,
@@ -409,7 +420,7 @@ public class FeatureManager {
                     relationship.baseTableColumn,
                     featureFid,
                     contentType
-            );
+            );*/
 
             SQLiteDatabase sqliteDb = gpkgDb.getDb();
 
@@ -417,13 +428,12 @@ public class FeatureManager {
             try {
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {
-                    int fididx = cursor.getColumnIndex("fid");
+                    //int fididx = cursor.getColumnIndex("fid");
                     int blobidx = cursor.getColumnIndex("data");
                     int contentidx = cursor.getColumnIndex("content_type");
-                    if (fididx != -1 && blobidx != -1) {
+                    if (blobidx != -1 && contentidx != -1) {
                         String rowContentType = cursor.getString(contentidx);
-                        if(rowContentType==contentType) {
-                            int fid = cursor.getInt(fididx);
+                        if(rowContentType.equals(contentType)) {
                             byte[] blob = cursor.getBlob(blobidx);
                             FeatureMedia media = new FeatureMedia();
                             media.blob = blob;
