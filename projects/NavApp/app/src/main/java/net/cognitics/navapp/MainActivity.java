@@ -491,8 +491,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     //todo: When I enable the following line, the screen doesn't refresh on my phone
                     String featureName = pointFeature.getAttribute("name");
 
-                    if (featureName == null) {
-                        featureName = Integer.toString(pointFeature.getFid());
+                    if (featureName == null || featureName.length()==0) {
+                        featureName = String.format(Locale.US,"%d: %.3fkm",pointFeature.getFid(),d/1000);
+                    }
+                    else
+                    {
+                        featureName = String.format(Locale.US,"%s: %.3fkm",featureName,d/1000);
                     }
                     customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
                 }
@@ -508,7 +512,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d", d / 1000.0, b, idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "", null);
+                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, null, null);
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
 
                 PointFeature cnp = rm.getCurrentCNP();
@@ -551,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 // We reuse the id here because we only want to display the current CNP
-                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) d, String.format(Locale.US,"%.3fkm",cnpDistance), cnp);
+                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, "", cnp);
             }
             customGraphics.updatePositions();
         }

@@ -157,8 +157,12 @@ public class CustomGraphics extends View {
     public void addPoint(FrameLayout camera, float bearing, float pitch, String id, float distance, String title, PointFeature feature) {
 
         if (navMap.containsKey(id)) {
-            if (title != null)
-                navMap.get(id).getText().setText(String.format("%s:\n %.3fkm", title, distance / 1000.0));
+            if (title != null ) {
+                if(title.length()>0)
+                    navMap.get(id).getText().setText(String.format("%s:\n %.3fkm", title, distance / 1000.0));
+                else
+                    navMap.get(id).getText().setText(String.format("%.3fkm", distance / 1000.0));
+            }
             navMap.get(id).setDistance((int) distance);
             updatePoint(bearing, pitch, id);
             return;
@@ -184,20 +188,6 @@ public class CustomGraphics extends View {
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.snap:
-                                                                /*String file = "Picturetest.jpg";
-                                                                File newfile = new File(file);
-                                                                try {
-                                                                    newfile.createNewFile();
-                                                                } catch (IOException e) {
-                                                                }
-
-                                                                Uri outputFileUri = Uri.fromFile(newfile);
-
-                                                                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                                                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
-                                                                ((Activity) context).startActivityForResult(cameraIntent, MainActivity.REQUEST_TAKE_PHOTO);
-                                                                */
                                     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                     // Because of how the camera code works, it assumes that if there
                                     // are any extras, then there must be an EXTRA_OUTPUT entry, so it doesn't
@@ -237,8 +227,12 @@ public class CustomGraphics extends View {
         camera.addView(newPoint);
         newPoint.setDistance((int) distance);
         camera.addView(newPoint.getText());
-        if (title != null)
-            navMap.get(id).getText().setText(String.format("%s:\n %.3fkm", title, distance / 1000.0));
+        if (title != null) {
+            if(title.length() > 0)
+                navMap.get(id).getText().setText(title);
+             else
+                navMap.get(id).getText().setText(String.format("%.3fkm", distance / 1000.0));
+        }
     }
 
     public void addLine(NavPoint navOne, NavPoint navtwo) {
