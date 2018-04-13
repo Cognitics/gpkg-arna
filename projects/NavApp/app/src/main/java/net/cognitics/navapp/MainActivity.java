@@ -276,20 +276,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             parseAndInitializeRoute(rowText);
 
         } else if ((requestCode == REQUEST_TAKE_PHOTO) && resultCode == Activity.RESULT_OK) {
-            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
-            Bundle extras = data.getExtras();
-            mImageView.setVisibility(View.VISIBLE);
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            if(sPhotoFeature !=null) {
+                ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+                Bundle extras = data.getExtras();
+                mImageView.setVisibility(View.VISIBLE);
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            imageBitmap.recycle();
-            mImageView.setImageBitmap(imageBitmap);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                imageBitmap.recycle();
+                mImageView.setImageBitmap(imageBitmap);
 
-            sPhotoFeature.setRelatedBitmap(byteArray);
-            // Add to the relationship table with some existing images
-            mViewModel.getFeatureManager().addRelatedMedia(sPhotoFeature, byteArray);
+                sPhotoFeature.setRelatedBitmap(byteArray);
+                // Add to the relationship table with some existing images
+                int mediaFID = mViewModel.getFeatureManager().addRelatedMedia(sPhotoFeature, byteArray);
+                Log.d("NAVAPP", "Added media " + mediaFID);
+            }
             recreate();
 
         } else if ((requestCode == REQUEST_PICK_PHOTO) && resultCode == Activity.RESULT_OK) {
@@ -309,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             prefDisplayPOI = preferences.getBoolean("display_poi", TRUE);
             prefCNPOffRouteDistance = Float.parseFloat(preferences.getString("cnp_off_route_distance", "25"));
             prefCNPArrivalDistance = Float.parseFloat(preferences.getString("cnp_arrival_distance", "10"));
+            recreate();
         }
     }
 
@@ -494,11 +498,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
 
-
-            //customGraphics.invalidate();
-
-
-
             RouteManager rm = mViewModel.getRouteManager();
             if (rm != null) {
                 rm.setCurrentPositionAndBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation(), bearing);
@@ -511,12 +510,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 msgText.setText(mViewModel.messageLog);
                 customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "", null);
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
-                customGraphics.updatePositions();
-
 
                 PointFeature cnp = rm.getCurrentCNP();
                 int cnpID = rm.getCurrentCNPID();
-                if(mViewModel.currentCNPID!=cnpID || mViewModel.cnpImage==null) {
+                if(cnp!=null && (mViewModel.currentCNPID!=cnpID || mViewModel.cnpImage==null)) {
                     mViewModel.currentCNPID=cnpID;
                     Log.d("NAVAPP","Switching CNP IDs");
                     // get image bitmap from cnp
@@ -553,9 +550,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
-                // get cnp bearing/distance
-                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "id", (float) d, String.format(Locale.US,"%.3fkm",cnpDistance), cnp);
+                // We reuse the id here because we only want to display the current CNP
+                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) d, String.format(Locale.US,"%.3fkm",cnpDistance), cnp);
             }
+            customGraphics.updatePositions();
         }
     }
 

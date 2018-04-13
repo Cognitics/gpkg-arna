@@ -170,7 +170,7 @@ public class GeoPackageRelatedTables {
     }
     public void addFeatureRelationship(RelatedTablesRelationship relationship, int baseFID, int relatedFID)
     {
-        String query = String.format("INSERT INTO %s (base_id,related_id) VALUES(%d,%d)");
+        String query = String.format("INSERT INTO %s (base_id,related_id) VALUES(%d,%d)",relationship.mappingTableName,baseFID,relatedFID);
         Cursor cursor = sqliteDb.rawQuery(query, null);
         try {
             cursor.moveToFirst();
@@ -207,6 +207,8 @@ public class GeoPackageRelatedTables {
         } finally {
             cursor.close();
         }
+
+        // Don't forget to save the contents
         return fid;
     }
 }

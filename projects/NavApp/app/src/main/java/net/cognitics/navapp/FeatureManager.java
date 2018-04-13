@@ -504,14 +504,19 @@ public class FeatureManager {
     // This is not very generic for now, it's adding a photo to a table. It could
     // be that the specific table we choose has something other than images, but this should still work
     // Future enhancements will make it more generic.
-    public void addRelatedMedia(PointFeature feature,byte[] blob)
+    public int addRelatedMedia(PointFeature feature,byte[] blob)
     {
         ArrayList<RelatedTablesRelationship> relationships =
                 relatedTablesManager.getRelationships(feature.getLayerName());
-        //relationships.
         //which relationship to use? For now we'll assume there is only one.
         GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
-        gpkgRTE.addMedia("photos",blob,"image/png");
+        int mediaID = gpkgRTE.addMedia(relationships.get(0).relatedTableName,blob,"image/png");
+        gpkgRTE.addFeatureRelationship(relationships.get(0),feature.getFid(),mediaID);
+        // Bad for performance, but we use it here to make it easy to push changes
+        // back to the SD card without worrying about when the app exits, etc.
+        // todo: Make export/write to SD smarter, or possibly put a export button on
+        save();
+        return mediaID;
     }
 
     public ArrayList<RelatedTablesImageDialog.Row> relatedFeaturesTest() {
