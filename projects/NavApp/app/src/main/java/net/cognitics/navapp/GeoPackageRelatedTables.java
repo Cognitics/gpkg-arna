@@ -48,6 +48,19 @@ public class GeoPackageRelatedTables {
 
     }
 
+    /*
+    // Get unique content types from related media, and return all the relationships
+    // that have content of that type.
+    ArrayList<RelatedTablesRelationship> getRelationships(String layer, String content_type) {
+        ArrayList<RelatedTablesRelationship> contentSpecificRelationships = new ArrayList<>();
+        ArrayList<RelatedTablesRelationship> relationships = getRelationships(layer);
+        for(RelatedTablesRelationship relationship : relationships) {
+            //if(relationship.relationshipName)
+        }
+
+        return contentSpecificRelationships;
+    }
+    */
     ArrayList<RelatedTablesRelationship> getRelationships(String layer)
     {
         ArrayList<RelatedTablesRelationship> relationships = new ArrayList<RelatedTablesRelationship>();

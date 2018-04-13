@@ -179,7 +179,7 @@ public class CustomGraphics extends View
 
                                             //Get the PointFeature associated with this NavPoint
                                             //We can use this to attach a new photo
-                                            PointFeature pt = (PointFeature)v.getTag();
+                                            final PointFeature pt = (PointFeature)v.getTag();
                                           //  if(pt==null)
                                             {
                                                 // The NavPoint for the waypoint will be null
@@ -209,10 +209,10 @@ public class CustomGraphics extends View
                                                                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                                                 // Because of how the camera code works, it assumes that if there
                                                                 // are any extras, then there must be an EXTRA_OUTPUT entry, so it doesn't
-                                                                // appear that we can asssociate any other extras along for the ride.
+                                                                // appear that we can associate any other extras along for the ride.
                                                                 // Because of that we'll have to use a static member to track which
                                                                 // point feature to associate with the picture for now.
-                                                                //takePictureIntent.putExtra("kevin","washere");
+                                                                MainActivity.sPhotoFeature = pt;
                                                                 if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
                                                                     ((Activity)context).startActivityForResult(takePictureIntent, MainActivity.REQUEST_TAKE_PHOTO);
                                                                 }

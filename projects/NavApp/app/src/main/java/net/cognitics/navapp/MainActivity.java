@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static float prefCNPArrivalDistance = 10;
     public static float prefCNPOffRouteDistance = 25;
 
+    //I can't find a way to pass this to the take photo intent, so we're using a static right now.
+    public static PointFeature sPhotoFeature;
+
     public MainActivity() {
         //NULL
     }
@@ -283,6 +286,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             byte[] byteArray = stream.toByteArray();
             imageBitmap.recycle();
             mImageView.setImageBitmap(imageBitmap);
+
+            sPhotoFeature.setRelatedBitmap(byteArray);
+            // Add to the relationship table with some existing images
+            mViewModel.getFeatureManager().addRelatedMedia(sPhotoFeature, byteArray);
             recreate();
 
         } else if ((requestCode == REQUEST_PICK_PHOTO) && resultCode == Activity.RESULT_OK) {
@@ -513,8 +520,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     // get image bitmap from cnp
                     ArrayList<RelatedTablesRelationship> relationships = mViewModel.getFeatureManager().getRelatedTablesManager().getRelationships(cnp.getLayerName());
                     if(relationships.size()>0) {
-                        //We're only going to render the first relationship
-                        ArrayList<FeatureManager.FeatureMedia> mediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships.get(0),cnp.getFid());
+                        //We're only going to use specific content types
+                        ArrayList<FeatureManager.FeatureMedia> jpgMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/jpg",cnp.getFid());
+                        ArrayList<FeatureManager.FeatureMedia> pngMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/png",cnp.getFid());
+                        ArrayList<FeatureManager.FeatureMedia> mediaBlobs = new ArrayList<>();
+                        mediaBlobs.addAll(jpgMediaBlobs);
+                        mediaBlobs.addAll(pngMediaBlobs);
                         if(mediaBlobs.size()>0) {
                             // get a bitmap
                             ByteArrayInputStream is = new ByteArrayInputStream(mediaBlobs.get(0).blob); //stream pointing to your blob or file

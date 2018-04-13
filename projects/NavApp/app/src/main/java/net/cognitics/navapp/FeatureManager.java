@@ -392,11 +392,60 @@ public class FeatureManager {
         return relatedMedia;
     }
 
+    public ArrayList<FeatureMedia> getMediaBlobs(ArrayList<RelatedTablesRelationship> relationships, String contentType, int featureFid) {
+        ArrayList<FeatureMedia> mediaArrayList = new ArrayList<>();
+        for(RelatedTablesRelationship relationship : relationships) {
+            String queryString = String.format(Locale.US ,"select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d AND content_type='%s'",
+                    relationship.relatedTableName,
+                    relationship.baseTableName,
+                    relationship.baseTableColumn,
+                    relationship.relatedTableName,
+                    relationship.baseTableName,
+                    relationship.baseTableName,
+                    relationship.baseTableColumn,
+                    relationship.relatedTableName,
+                    relationship.relatedTableColumn,
+                    relationship.baseTableName,
+                    relationship.baseTableColumn,
+                    featureFid,
+                    contentType
+            );
+
+            SQLiteDatabase sqliteDb = gpkgDb.getDb();
+
+            Cursor cursor = sqliteDb.rawQuery(queryString, null);
+            try {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    int fididx = cursor.getColumnIndex("fid");
+                    int blobidx = cursor.getColumnIndex("data");
+                    int contentidx = cursor.getColumnIndex("content_type");
+                    if (fididx != -1 && blobidx != -1) {
+                        String rowContentType = cursor.getString(contentidx);
+                        if(rowContentType==contentType) {
+                            int fid = cursor.getInt(fididx);
+                            byte[] blob = cursor.getBlob(blobidx);
+                            FeatureMedia media = new FeatureMedia();
+                            media.blob = blob;
+                            media.relationship = relationship;
+                            media.contentType = contentType;
+                            mediaArrayList.add(media);
+                        }
+                    }
+                    cursor.moveToNext();
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        return mediaArrayList;
+    }
+
     public ArrayList<FeatureMedia> getMediaBlobs(RelatedTablesRelationship relationship, int featureFid) {
         ArrayList<FeatureMedia> mediaArrayList = new ArrayList<>();
         // For now, just show relationships for the first type of relationship there is.
 
-        GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
+        //GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
 
         //select photos.*,cnp_tampa.fid from photos left join cnp_tampa on cnp_tampa.fid=photos.id
         String queryString = String.format(Locale.US ,"select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d",
@@ -440,6 +489,19 @@ public class FeatureManager {
         }
 
         return mediaArrayList;
+    }
+
+    // This is not very generic for now, it's adding a photo to a table. It could
+    // be that the specific table we choose has something other than images, but this should still work
+    // Future enhancements will make it more generic.
+    public void addRelatedMedia(PointFeature feature,byte[] blob)
+    {
+        ArrayList<RelatedTablesRelationship> relationships =
+                relatedTablesManager.getRelationships(feature.getLayerName());
+        //relationships.
+        //which relationship to use? For now we'll assume there is only one.
+        GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
+        gpkgRTE.addMedia("photos",blob,"image/png");
     }
 
     public ArrayList<RelatedTablesImageDialog.Row> relatedFeaturesTest() {
