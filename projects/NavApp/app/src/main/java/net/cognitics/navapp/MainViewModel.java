@@ -2,6 +2,7 @@ package net.cognitics.navapp;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
@@ -45,6 +46,10 @@ public class MainViewModel extends AndroidViewModel {
     public String messageLog = new String();
 
     private CustomGraphics customGraphics;
+
+    public int currentCNPID = -1;
+
+    public Bitmap cnpImage;
 
     public MainViewModel(@NonNull Application application) {
         super(application);

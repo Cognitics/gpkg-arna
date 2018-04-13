@@ -90,6 +90,11 @@ public class RouteManager {
         }
     }
 
+    public int getCurrentCNPID()
+    {
+        return nextIndex;
+    }
+
     RouteManager(ArrayList<Point> route, HashMap<String, String> attributes, int fid, Context context) {
         currentRouteUTM = new ArrayList<Point>();
         currentRoute = new ArrayList<Point>();
@@ -300,8 +305,6 @@ public class RouteManager {
             else
                 Toast.makeText(context, "Arrived at waypoint: " + (nextIndex - 1), Toast.LENGTH_LONG).show();
         }
-
-
     }
 
     public int rewindRoutePoint() {

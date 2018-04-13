@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -39,9 +40,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -499,10 +502,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d", d / 1000.0, b, idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "*", null);
+                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "", null);
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
                 customGraphics.updatePositions();
+
+
                 PointFeature cnp = rm.getCurrentCNP();
+                int cnpID = rm.getCurrentCNPID();
+                if(mViewModel.currentCNPID!=cnpID || mViewModel.cnpImage==null) {
+                    // get image bitmap from cnp
+                    ArrayList<RelatedTablesRelationship> relationships = mViewModel.getFeatureManager().getRelatedTablesManager().getRelationships(cnp.getLayerName());
+                    if(relationships.size()>0) {
+                        //We're only going to render the first relationship
+                        ArrayList<FeatureManager.FeatureMedia> mediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships.get(0),cnp.getFid());
+                        if(mediaBlobs.size()>0) {
+                            // get a bitmap
+                            ByteArrayInputStream is = new ByteArrayInputStream(mediaBlobs.get(0).blob); //stream pointing to your blob or file
+                            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+                            mViewModel.cnpImage = BitmapFactory.decodeStream(is);
+                            if(mViewModel.cnpImage!=null) {
+                                mImageView.setImageBitmap(mViewModel.cnpImage);
+                                mImageView.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                mImageView.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                    }
+                }
+                double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                // get cnp bearing/distance
+                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "id", (float) d, String.format(Locale.US,"%.3fkm",cnpDistance), cnp);
             }
         }
     }

@@ -169,8 +169,8 @@ public class CustomGraphics extends View
         this.camera=camera;
         final NavPoint newPoint = new NavPoint(context,bearing,pitch);
         newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
-        if(title!=null && title=="*")
-            newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
+        if(title!=null && title=="")
+            newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.route_dot));
         else
             newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.cnpicon));
 
