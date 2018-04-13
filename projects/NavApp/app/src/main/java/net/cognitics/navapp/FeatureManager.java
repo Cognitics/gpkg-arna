@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageManager;
@@ -269,7 +270,20 @@ public class FeatureManager {
                             if (table.startsWith("cnp_")) {
                                 cnpFeatures.add(feature);
                                 if(cnpRelationships.size()>0) {
-                                    ArrayList<Integer> fids = relatedTablesManager.getRelatedFIDs(cnpRelationships.get(0),fid);
+                                    //ArrayList<Integer> fids = relatedTablesManager.getRelatedFIDs(cnpRelationships.get(0),fid);
+
+                                    /*
+                                    The use case is that when the CNP changes, the MainActivity needs to update the current display
+                                    ...so when nav point changes...
+                                    ......get the media from the point feature
+                                    .........point feature needs to know where the media is (Relationship and fid)
+                                    feature manage has a get media (PointFeature) method
+
+                                    table_name (e.g. cnp_meridian) -> relationship (contains HashMap<int,ArrayList<int>>
+                                    which means that each relationship object contains the entire map of related table entries
+
+
+                                     */
 
                                 }
                             } else if (table.startsWith("poi_")) {
@@ -312,7 +326,9 @@ public class FeatureManager {
                 }
 
             }
-
+            if(cnpFeatures.size() > 0) {
+                routeManager.associateCriticalNavigationPoints(cnpFeatures);
+            }
 
         } else {
             return FALSE;
@@ -357,12 +373,73 @@ public class FeatureManager {
         return geoCenter;
     }
 
+    public class FeatureMedia {
+        public RelatedTablesRelationship relationship; // where it came from
+        public String contentType; // from the media table
+        public byte[] blob;
+    }
     // create an inner class for related media
     // fid, byte array, content type, relationship....?
-    public void getRelatedMedia(PointFeature feature) {
-        // get the relationships for this table this feature belongs to (read this up front, keep a hashmap of tables to array of Relationships
-        // find the list of fids related to this feature
-        // return the data for the first one.
+
+    public ArrayList<FeatureMedia> getRelatedMedia(PointFeature feature) {
+        ArrayList<FeatureMedia> relatedMedia = new ArrayList<>();
+        ArrayList<RelatedTablesRelationship> relationships =
+            relatedTablesManager.getRelationships(feature.getLayerName());
+        ArrayList<FeatureMedia> media = new ArrayList<>();
+        for(RelatedTablesRelationship relationship : relationships) {
+            relatedMedia.addAll(getMediaBlobs(relationship,feature.getFid()));
+        }
+        return relatedMedia;
+    }
+
+    public ArrayList<FeatureMedia> getMediaBlobs(RelatedTablesRelationship relationship, int featureFid) {
+        ArrayList<FeatureMedia> mediaArrayList = new ArrayList<>();
+        // For now, just show relationships for the first type of relationship there is.
+
+        GeoPackageRelatedTables gpkgRTE = new GeoPackageRelatedTables(geopackage);
+
+        //select photos.*,cnp_tampa.fid from photos left join cnp_tampa on cnp_tampa.fid=photos.id
+        String queryString = String.format(Locale.US ,"select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d",
+                relationship.relatedTableName,
+                relationship.baseTableName,
+                relationship.baseTableColumn,
+                relationship.relatedTableName,
+                relationship.baseTableName,
+                relationship.baseTableName,
+                relationship.baseTableColumn,
+                relationship.relatedTableName,
+                relationship.relatedTableColumn,
+                relationship.baseTableName,
+                relationship.baseTableColumn,
+                featureFid
+        );
+
+        SQLiteDatabase sqliteDb = gpkgDb.getDb();
+
+        Cursor cursor = sqliteDb.rawQuery(queryString, null);
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                int fididx = cursor.getColumnIndex("fid");
+                int blobidx = cursor.getColumnIndex("data");
+                int contentidx = cursor.getColumnIndex("content_type");
+                if (fididx != -1 && blobidx != -1) {
+                    String contentType = cursor.getString(contentidx);
+                    int fid = cursor.getInt(fididx);
+                    byte[] blob = cursor.getBlob(blobidx);
+                    FeatureMedia media = new FeatureMedia();
+                    media.blob = blob;
+                    media.relationship = relationship;
+                    media.contentType = contentType;
+                    mediaArrayList.add(media);
+                }
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return mediaArrayList;
     }
 
     public ArrayList<RelatedTablesImageDialog.Row> relatedFeaturesTest() {
@@ -379,7 +456,7 @@ public class FeatureManager {
                 // Query for the data the hard way. It would be cleaner and probably faster
                 // to do a join against the tables
                 //select photos.*,cnp_tampa.fid from photos left join cnp_tampa on cnp_tampa.fid=photos.id
-                String queryString = String.format("select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d",
+                String queryString = String.format(Locale.US ,"select %s.*,%s.%s from %s left join %s on %s.%s=%s.%s where %s.%s=%d",
                         relationship.relatedTableName,
                         relationship.baseTableName,
                         relationship.baseTableColumn,

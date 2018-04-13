@@ -1,5 +1,8 @@
 package net.cognitics.navapp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Created by kbentley on 3/10/2018.
  *
@@ -13,4 +16,6 @@ public class RelatedTablesRelationship {
     public String relatedTableColumn;
     public String relationshipName;
     public String mappingTableName;
+
+    //public HashMap<Integer,ArrayList<Integer>> mediaRelationships = new HashMap<Integer,ArrayList<Integer>>();
 }

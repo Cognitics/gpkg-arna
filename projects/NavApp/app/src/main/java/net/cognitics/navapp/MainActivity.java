@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 tvHeading.setText("Heading:\n" + (int) bearing);
 
             //customGraphics.clearPoints();
-            /*
+/*
             ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();
             for(PointFeature pointFeature : cnpFeatures)
             {
@@ -463,21 +463,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     featureName = Integer.toString(pointFeature.getFid());
                 }
                 customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName,pointFeature);
-            }
-            */
-            ArrayList<PointFeature> poiFeatures = mViewModel.getFeatureManager().getPoiPointFeatures();
-            for (PointFeature pointFeature : poiFeatures) {
-                double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
-                double d = pointFeature.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
-                //todo: add different colors for cnp point to differentiate from the next route point
-                //todo: make them clickable?
-                //todo: When I enable the following line, the screen doesn't refresh on my phone
-                String featureName = pointFeature.getAttribute("name");
+            }*/
 
-                if (featureName == null) {
-                    featureName = Integer.toString(pointFeature.getFid());
+            if(prefDisplayPOI) {
+                ArrayList<PointFeature> poiFeatures = mViewModel.getFeatureManager().getPoiPointFeatures();
+                for (PointFeature pointFeature : poiFeatures) {
+                    double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                    double d = pointFeature.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                    //todo: add different colors for cnp point to differentiate from the next route point
+                    //todo: make them clickable?
+                    //todo: When I enable the following line, the screen doesn't refresh on my phone
+                    String featureName = pointFeature.getAttribute("name");
+
+                    if (featureName == null) {
+                        featureName = Integer.toString(pointFeature.getFid());
+                    }
+                    customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
                 }
-                customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
             }
             RouteManager rm = mViewModel.getRouteManager();
             if (rm != null) {
@@ -491,6 +493,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 msgText.setText(mViewModel.messageLog);
                 customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "*", null);
                 customGraphics.updatePositions();
+                PointFeature cnp = rm.getCurrentCNP();
             }
         }
     }
