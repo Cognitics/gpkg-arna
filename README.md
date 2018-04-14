@@ -1,8 +1,8 @@
 # gpkg-arna
 Augmented Reality Navigation Assistance Using GeoPackage
 
+This was our very first Android application ever. The code is still a bit messy, and there is some functionality that we started that has not yet been completed. 
 
-__Release Notes__
 
 # How to Use
  - You can change some settings by clicking on the wrench in the bottom left of the screen.
