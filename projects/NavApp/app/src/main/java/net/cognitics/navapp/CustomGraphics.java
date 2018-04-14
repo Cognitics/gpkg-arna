@@ -156,7 +156,7 @@ public class CustomGraphics extends View {
     }
 
 
-    public void addPoint(FrameLayout camera, float bearing, float pitch, String id, float distance, String title, PointFeature feature) {
+    public void addPoint(FrameLayout camera, float bearing, float pitch, String id, float distance, String title, int drawable, PointFeature feature) {
 
         if (navMap.containsKey(id)) {
             if (title != null ) {
@@ -171,11 +171,8 @@ public class CustomGraphics extends View {
         }
         this.camera = camera;
         final NavPoint newPoint = new NavPoint(context, bearing, pitch);
-        newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_action_name));
-        if (title != null && title == "")
-            newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.route_dot));
-        else
-            newPoint.setBackgroundDrawable(getResources().getDrawable(R.drawable.cnpicon));
+        newPoint.setBackgroundDrawable(getResources().getDrawable(drawable));
+
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
             public void onClick(View v) {

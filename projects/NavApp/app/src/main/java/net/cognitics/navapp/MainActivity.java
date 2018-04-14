@@ -520,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     {
                         featureName = String.format(Locale.US,"%s: %.3fkm",featureName,d/1000);
                     }
-                    customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
+                    customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, R.drawable.cnpicon, pointFeature);
                 }
             }
 
@@ -531,10 +531,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double b = rm.getNearestBearing();
                 double d = rm.getNearestDistance();
                 int idx = rm.getNextIndex();
-                mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d", d / 1000.0, b, idx));
+                mViewModel.setMessageLog(String.format(Locale.US,"Distance: %.4fkm\nBearing: %.4f\nIndex: %d", d / 1000.0, b, idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, null, null);
+                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, String.format("%.3fkm", d / 1000.0), R.drawable.ic_action_name,  null);
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
 
                 PointFeature cnp = rm.getCurrentCNP();
@@ -577,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 // We reuse the id here because we only want to display the current CNP
-                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, "", cnp);
+                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, null, R.drawable.route_dot, cnp);
             }
             customGraphics.updatePositions();
         }
