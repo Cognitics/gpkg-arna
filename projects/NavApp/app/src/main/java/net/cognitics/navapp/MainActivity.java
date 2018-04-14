@@ -494,8 +494,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 // showCamera.resume();
                 resumeCamera = 0;
             }
-            if (tvHeading != null)
-                tvHeading.setText("Heading:\n" + (int) bearing);
 
             //customGraphics.clearPoints();
 /*
@@ -548,6 +546,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
                 customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, String.format(Locale.US,"%.3fkm", d / 1000.0), R.drawable.route_dot,  null);
+                if (tvHeading != null)
+                    tvHeading.setText(String.format(Locale.US,"  Heading\n%d\nDistance:\n%.3fkm  ",(int)bearing,d/1000.0));
+                    //tvHeading.setText(String.format(Locale.US,"Heading:\n %d\nDistance to Waypoint:%.3fkm\n",(int)bearing,d/1000.0));
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
 
                 PointFeature cnp = rm.getCurrentCNP();
@@ -591,6 +592,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 // We reuse the id here because we only want to display the current CNP
                 customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, null, R.drawable.ic_action_name, cnp);
+            }
+            else
+            {
+                if (tvHeading != null)
+                    tvHeading.setText("Heading:\n" + (int) bearing);
             }
             customGraphics.updatePositions();
         }
