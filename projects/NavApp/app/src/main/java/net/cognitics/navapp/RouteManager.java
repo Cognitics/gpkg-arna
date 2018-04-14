@@ -1,10 +1,12 @@
 package net.cognitics.navapp;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import mil.nga.wkb.geom.Point;
@@ -71,6 +73,7 @@ public class RouteManager {
                     closestCNP = cnp;
                 }
             }
+            Log.d("NAVAPP",String.format(Locale.US,"Route vert %d is related to cnp %d, dist=%f",closestIdx,closestCNP.getFid(),closestDistance));
             criticalNavigationPoints.put(closestIdx,closestCNP);
         }
     }

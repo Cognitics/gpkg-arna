@@ -160,19 +160,16 @@ public class CustomGraphics extends View {
 
         if (navMap.containsKey(id)) {
             if (title != null ) {
-                if(title.length()>0)
-                    navMap.get(id).getText().setText(String.format("%s:\n %.3fkm", title, distance / 1000.0));
-                else
-                    navMap.get(id).getText().setText(String.format("%.3fkm", distance / 1000.0));
+                navMap.get(id).getText().setText(title);
             }
             navMap.get(id).setDistance((int) distance);
-            updatePoint(bearing, pitch, id);
+
+            updatePoint(bearing, pitch, id, feature);
             return;
         }
         this.camera = camera;
         final NavPoint newPoint = new NavPoint(context, bearing, pitch);
         newPoint.setBackgroundDrawable(getResources().getDrawable(drawable));
-
 
         newPoint.setOnClickListener(new AppCompatImageButton.OnClickListener() {
             public void onClick(View v) {
@@ -200,9 +197,13 @@ public class CustomGraphics extends View {
                                     break;
 
                                 case R.id.select:
+                                    MainActivity.sPhotoFeature = pt;
                                     Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                                     // Start the Intent
+                                    galleryIntent.setType("image/*");
+                                    galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                                    galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
                                     ((Activity) context).startActivityForResult(galleryIntent, MainActivity.REQUEST_PICK_PHOTO);
                                     break;
 
@@ -227,11 +228,9 @@ public class CustomGraphics extends View {
         newPoint.setDistance((int) distance);
         camera.addView(newPoint.getText());
         if (title != null) {
-            if(title.length() > 0)
-                navMap.get(id).getText().setText(title);
-             else
-                navMap.get(id).getText().setText(String.format("%.3fkm", distance / 1000.0));
+            navMap.get(id).getText().setText(title);
         }
+
     }
 
     public void addLine(NavPoint navOne, NavPoint navtwo) {
@@ -242,10 +241,11 @@ public class CustomGraphics extends View {
         lineList.clear();
     }
 
-    public void updatePoint(float bearing, float pitch, String id) {
+    public void updatePoint(float bearing, float pitch, String id, PointFeature pt) {
         if (navMap.containsKey(id)) {
             navMap.get(id).setBearing(bearing);
             navMap.get(id).setPitch(pitch);
+            navMap.get(id).setTag(pt);
         }
     }
 

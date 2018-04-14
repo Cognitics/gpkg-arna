@@ -148,6 +148,25 @@ public class FeatureManager {
         return tables;
     }
 
+    private void addMediaRelationship(String route, String table)
+    {
+        // Add a media table and a relationship for photos
+        String mediaTable = route + "_photos";
+        relatedTablesManager.addMediaTable(mediaTable);
+        // Add the relationship table
+        RelatedTablesRelationship relationship = new RelatedTablesRelationship();
+        relationship.baseTableName = table;
+        relationship.baseTableColumn = "fid";
+        relationship.relatedTableName = mediaTable;
+        relationship.relatedTableColumn = "id";
+        relationship.relationshipName = "media";
+        relationship.mappingTableName = table + "_photos";
+        relatedTablesManager.addRelationship(relationship);
+        save();
+        String msg = String.format("Created media relationship for " + route);
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+    }
+
     public Boolean initializeRoute(String route) {
         if (geopackage != null) {
             gpkgDb = geopackage.getConnection().getDb();
@@ -181,38 +200,31 @@ public class FeatureManager {
                 if (table.startsWith("cnp_")) {
                     cnpRelationships = relatedTablesManager.getRelationships(table);
                     if(cnpRelationships.size()>0) {
-                        String msg = String.format("Found %d relationships for %s", cnpRelationships.size(), table);
+                        String msg = String.format(Locale.US,"Found %d relationships for %s", cnpRelationships.size(), table);
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
                     }
                     else
                     {
-                        // Add a media table and a relationship for photos
-                        String mediaTable = route + "_photos";
-                        relatedTablesManager.addMediaTable(mediaTable);
-                        // Add the relationship table
-                        RelatedTablesRelationship relationship = new RelatedTablesRelationship();
-                        relationship.baseTableName = table;
-                        relationship.baseTableColumn = "fid";
-                        relationship.relatedTableName = mediaTable;
-                        relationship.relatedTableColumn = "id";
-                        relationship.relationshipName = "media";
-                        relationship.mappingTableName = table + "_photos";
-                        relatedTablesManager.addRelationship(relationship);
-                        save();
-                        String msg = String.format("Created media relationship for " + route);
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        addMediaRelationship(route,table);
                     }
                 } else if (table.startsWith("poi_")) {
                     poiRelationships = relatedTablesManager.getRelationships(table);
                     if(poiRelationships.size()>0) {
-                        String msg = String.format("Found %d relationships for %s", poiRelationships.size(), table);
+                        String msg = String.format(Locale.US,"Found %d relationships for %s", poiRelationships.size(), table);
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }
+                    else
+                    {
+                        addMediaRelationship(route,table);
                     }
                 } else if (table.startsWith("aoi_")) {
                     aoiRelationships = relatedTablesManager.getRelationships(table);
                     if(aoiRelationships.size()>0) {
                         String msg = String.format("Found %d relationships for %s", aoiRelationships.size(), table);
                         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    }else
+                    {
+                        addMediaRelationship(route,table);
                     }
                 } else if (table.startsWith("route_")) {
                     routeRelationships = relatedTablesManager.getRelationships(table);

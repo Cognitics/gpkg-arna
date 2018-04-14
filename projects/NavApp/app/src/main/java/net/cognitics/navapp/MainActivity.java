@@ -46,6 +46,9 @@ import android.widget.Toast;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -300,25 +303,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             recreate();
 
         } else if ((requestCode == REQUEST_PICK_PHOTO) && resultCode == Activity.RESULT_OK) {
+            if(sPhotoFeature !=null) {
+                ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+                try {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        InputStream stream = getContentResolver().openInputStream(uri);
+                        Bitmap aBitmap = BitmapFactory.decodeStream(stream);
+                        Bitmap thumb = Bitmap.createScaledBitmap(aBitmap, 512, 512, false);
+                        stream.close();
 
-            Uri photoUri;
-            photoUri = data.getData();
-            String[] filePathColumn = {
-                    MediaStore.Images.Media.DATA
-            };
-            Cursor cursor = getContentResolver().query(photoUri, filePathColumn, null, null,
-                    null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            Bitmap aBitmap = BitmapFactory.decodeFile(picturePath);
-            int thumbFactor = 5;
-            Bitmap thumb = Bitmap.createScaledBitmap(aBitmap, aBitmap.getWidth()/thumbFactor, aBitmap.getHeight()/thumbFactor, false);
-            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
-            mImageView.setImageBitmap(thumb);
-            recreate();
+                        ByteArrayOutputStream oStream = new ByteArrayOutputStream();
+                        thumb.compress(Bitmap.CompressFormat.PNG, 100, oStream);
 
+                        byte[] byteArray = oStream.toByteArray();
+                        sPhotoFeature.setRelatedBitmap(byteArray);
+                        // Add to the relationship table with some existing images
+                        int mediaFID = mViewModel.getFeatureManager().addRelatedMedia(sPhotoFeature, byteArray);
+                        Log.d("NAVAPP", "Added media " + mediaFID);
+                        mImageView.setImageBitmap(thumb);
+                    }
+                }
+                catch(FileNotFoundException e){
+                    e.printStackTrace();
+                } catch(IOException e){
+                    e.printStackTrace();
+                }
+
+                recreate();
+            }
         }
         // We don't check resultCode for preferences since there is only back/cancel to get out
         else if (requestCode == REQUEST_PREFERENCES) {
@@ -534,14 +547,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mViewModel.setMessageLog(String.format(Locale.US,"Distance: %.4fkm\nBearing: %.4f\nIndex: %d", d / 1000.0, b, idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, String.format("%.3fkm", d / 1000.0), R.drawable.ic_action_name,  null);
+                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, String.format(Locale.US,"%.3fkm", d / 1000.0), R.drawable.route_dot,  null);
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
 
                 PointFeature cnp = rm.getCurrentCNP();
                 int cnpID = rm.getCurrentCNPID();
-                if(cnp!=null && (mViewModel.currentCNPID!=cnpID || mViewModel.cnpImage==null)) {
+                if(cnp!=null && mViewModel.currentCNPID!=cnpID ) {
                     mViewModel.currentCNPID=cnpID;
-                    Log.d("NAVAPP","Switching CNP IDs");
+                    Log.d("NAVAPP",String.format(Locale.US,"Switching CNP IDs to %d, fid=%d",cnpID,cnp.getFid()));
                     // get image bitmap from cnp
                     ArrayList<RelatedTablesRelationship> relationships = mViewModel.getFeatureManager().getRelatedTablesManager().getRelationships(cnp.getLayerName());
                     ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
@@ -577,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
                 // We reuse the id here because we only want to display the current CNP
-                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, null, R.drawable.route_dot, cnp);
+                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, null, R.drawable.ic_action_name, cnp);
             }
             customGraphics.updatePositions();
         }
