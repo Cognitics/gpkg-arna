@@ -59,15 +59,15 @@ public class CustomGraphics extends View {
                 NavPoint p2 = n.getPoints()[1];
                 if (p1 != null && p2 != null) {
 
-                    if ((p1.getX() > 0 && p1.getX() < camera.getWidth() - p1.getWidth()) && (p2.getX() > 0 && p2.getX() < camera.getWidth() - p2.getWidth())) {
+                  ///  if ((p1.getX() > 0 && p1.getX() < camera.getWidth() - p1.getWidth()) && (p2.getX() > 0 && p2.getX() < camera.getWidth() - p2.getWidth())) {
 
 
                         c.drawLine(p1.getX() + (p1.getWidth() / 2), p1.getY() + (p1.getHeight() / 2), p2.getX() + (p2.getWidth() / 2), p2.getY() + (p2.getHeight() / 2), paint);
-                    }
+                  //  }
                 } else if (n.getPoints() != null && p1 != null) {
-                    if (p1.getX() > 0 && p1.getX() < camera.getWidth() - p1.getWidth()) {
+                  //  if (p1.getX() > 0 && p1.getX() < camera.getWidth() - p1.getWidth()) {
                         c.drawLine(p1.getX() + (p1.getWidth() / 2), p1.getY() + (p1.getHeight() / 2), camera.getMeasuredWidth() / 2, camera.getMeasuredHeight(), paint);
-                    }
+                   // }
                 }
             }
         }
