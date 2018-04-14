@@ -27,6 +27,14 @@ This was our very first Android application ever. The code is still a bit messy,
 # Building
 See the INSTALL.md file.
 
+Third party libraries are configured to be used automatically in the gradle script.
+
+Third party scripts used include:
+
+ - com.github.angads25:filepicker
+ - com.github.karanchuri:PermissionManager
+ - mil.nga.geopackage:geopackage-android
+
 __DEADLINE: APRIL 15TH__
 
 # Requirements for the app:
