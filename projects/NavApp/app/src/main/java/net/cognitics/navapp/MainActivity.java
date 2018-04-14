@@ -43,10 +43,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -101,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static Boolean prefDisplayPOI = TRUE;
     public static float prefCNPArrivalDistance = 10;
     public static float prefCNPOffRouteDistance = 25;
+
+    //I can't find a way to pass this to the take photo intent, so we're using a static right now.
+    public static PointFeature sPhotoFeature;
 
     public MainActivity() {
         //NULL
@@ -275,16 +280,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             parseAndInitializeRoute(rowText);
 
         } else if ((requestCode == REQUEST_TAKE_PHOTO) && resultCode == Activity.RESULT_OK) {
-            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
-            Bundle extras = data.getExtras();
-            mImageView.setVisibility(View.VISIBLE);
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            if(sPhotoFeature !=null) {
+                ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+                Bundle extras = data.getExtras();
+                mImageView.setVisibility(View.VISIBLE);
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            imageBitmap.recycle();
-            mImageView.setImageBitmap(imageBitmap);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                imageBitmap.recycle();
+                mImageView.setImageBitmap(imageBitmap);
+
+                sPhotoFeature.setRelatedBitmap(byteArray);
+                // Add to the relationship table with some existing images
+                int mediaFID = mViewModel.getFeatureManager().addRelatedMedia(sPhotoFeature, byteArray);
+                Log.d("NAVAPP", "Added media " + mediaFID);
+            }
             recreate();
 
         } else if ((requestCode == REQUEST_PICK_PHOTO) && resultCode == Activity.RESULT_OK) {
@@ -322,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             prefDisplayPOI = preferences.getBoolean("display_poi", TRUE);
             prefCNPOffRouteDistance = Float.parseFloat(preferences.getString("cnp_off_route_distance", "25"));
             prefCNPArrivalDistance = Float.parseFloat(preferences.getString("cnp_arrival_distance", "10"));
+            recreate();
         }
     }
 
@@ -472,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 tvHeading.setText("Heading:\n" + (int) bearing);
 
             //customGraphics.clearPoints();
-            /*
+/*
             ArrayList<PointFeature> cnpFeatures = mViewModel.getFeatureManager().getCnpFeatures();
             for(PointFeature pointFeature : cnpFeatures)
             {
@@ -488,27 +501,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     featureName = Integer.toString(pointFeature.getFid());
                 }
                 customGraphics.addPoint(cameraPreview, (float) b, 90,Integer.toString(pointFeature.getFid()),(float)d,featureName,pointFeature);
-            }
-            */
-            ArrayList<PointFeature> poiFeatures = mViewModel.getFeatureManager().getPoiPointFeatures();
-            for (PointFeature pointFeature : poiFeatures) {
-                double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
-                double d = pointFeature.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
-                //todo: add different colors for cnp point to differentiate from the next route point
-                //todo: make them clickable?
-                //todo: When I enable the following line, the screen doesn't refresh on my phone
-                String featureName = pointFeature.getAttribute("name");
+            }*/
 
-                if (featureName == null) {
-                    featureName = Integer.toString(pointFeature.getFid());
+            if(prefDisplayPOI) {
+                ArrayList<PointFeature> poiFeatures = mViewModel.getFeatureManager().getPoiPointFeatures();
+                for (PointFeature pointFeature : poiFeatures) {
+                    double b = pointFeature.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                    double d = pointFeature.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                    //todo: add different colors for cnp point to differentiate from the next route point
+                    //todo: make them clickable?
+                    //todo: When I enable the following line, the screen doesn't refresh on my phone
+                    String featureName = pointFeature.getAttribute("name");
+
+                    if (featureName == null || featureName.length()==0) {
+                        featureName = String.format(Locale.US,"%d: %.3fkm",pointFeature.getFid(),d/1000);
+                    }
+                    else
+                    {
+                        featureName = String.format(Locale.US,"%s: %.3fkm",featureName,d/1000);
+                    }
+                    customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
                 }
-                customGraphics.addPoint(cameraPreview, (float) b, 90, Integer.toString(pointFeature.getFid()), (float) d, featureName, pointFeature);
             }
-
-
-            //customGraphics.invalidate();
-
-
 
             RouteManager rm = mViewModel.getRouteManager();
             if (rm != null) {
@@ -520,10 +534,52 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mViewModel.setMessageLog(String.format("Distance: %.4fkm\nBearing: %.4f\nIndex: %d", d / 1000.0, b, idx));
                 TextView msgText = (TextView) findViewById(R.id.messages);
                 msgText.setText(mViewModel.messageLog);
-                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, "*", null);
+                customGraphics.addPoint(cameraPreview, (float) b, 90, "route_point", (float) d, null, null);
                 customGraphics.addLine(customGraphics.getPoint("route_point"),null);
-                customGraphics.updatePositions();
+
+                PointFeature cnp = rm.getCurrentCNP();
+                int cnpID = rm.getCurrentCNPID();
+                if(cnp!=null && (mViewModel.currentCNPID!=cnpID || mViewModel.cnpImage==null)) {
+                    mViewModel.currentCNPID=cnpID;
+                    Log.d("NAVAPP","Switching CNP IDs");
+                    // get image bitmap from cnp
+                    ArrayList<RelatedTablesRelationship> relationships = mViewModel.getFeatureManager().getRelatedTablesManager().getRelationships(cnp.getLayerName());
+                    ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+                    if(relationships.size()>0) {
+                        //We're only going to use specific content types
+                        ArrayList<FeatureManager.FeatureMedia> jpgMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/jpeg",cnp.getFid());
+                        ArrayList<FeatureManager.FeatureMedia> pngMediaBlobs = mViewModel.getFeatureManager().getMediaBlobs(relationships,"image/png",cnp.getFid());
+                        ArrayList<FeatureManager.FeatureMedia> mediaBlobs = new ArrayList<>();
+                        mediaBlobs.addAll(jpgMediaBlobs);
+                        mediaBlobs.addAll(pngMediaBlobs);
+                        if(mediaBlobs.size()>0) {
+                            Log.d("NAVAPP","Getting new media");
+                            // get a bitmap
+                            ByteArrayInputStream is = new ByteArrayInputStream(mediaBlobs.get(0).blob); //stream pointing to your blob or file
+                            mViewModel.cnpImage = BitmapFactory.decodeStream(is);
+                            if(mViewModel.cnpImage!=null) {
+                                Log.d("NAVAPP","Enabling CNP image");
+                                mImageView.setImageBitmap(mViewModel.cnpImage);
+                                mImageView.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                mImageView.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                        else {
+                            mImageView.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                    else {
+                        mImageView.setVisibility(View.INVISIBLE);
+                    }
+                }
+                double cnpBearing = cnp.getBearing(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                double cnpDistance = cnp.getDistance(mViewModel.getGps().getLatitude(), mViewModel.getGps().getLongitude(), mViewModel.getGps().getElevation());
+                // We reuse the id here because we only want to display the current CNP
+                customGraphics.addPoint(cameraPreview, (float) cnpBearing, 90, "cnp", (float) cnpDistance, "", cnp);
             }
+            customGraphics.updatePositions();
         }
     }
 

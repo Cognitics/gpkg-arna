@@ -48,7 +48,7 @@ public class LineStringFeature {
         this.attributes = attributes;
         for(Point pt : line.getPoints())
         {
-            WGS84 geo = new WGS84(pt.getX(),pt.getY());
+            WGS84 geo = new WGS84(pt.getY(),pt.getX());
             // Project to UTM
             UTM utm = new UTM(geo);
             Point utmPoint = new Point();

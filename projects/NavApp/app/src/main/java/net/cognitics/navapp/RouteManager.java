@@ -90,6 +90,11 @@ public class RouteManager {
         }
     }
 
+    public int getCurrentCNPID()
+    {
+        return nextIndex;
+    }
+
     RouteManager(ArrayList<Point> route, HashMap<String, String> attributes, int fid, Context context) {
         currentRouteUTM = new ArrayList<Point>();
         currentRoute = new ArrayList<Point>();
@@ -136,7 +141,7 @@ public class RouteManager {
 
         currentRouteUTM.clear();
         for (Point pt : currentRoute) {
-            WGS84 geo = new WGS84(pt.getX(), pt.getY());
+            WGS84 geo = new WGS84(pt.getY(), pt.getX());
             // Project to UTM
             UTM utm = new UTM(geo);
             Point utmPoint = new Point();
@@ -300,8 +305,6 @@ public class RouteManager {
             else
                 Toast.makeText(context, "Arrived at waypoint: " + (nextIndex - 1), Toast.LENGTH_LONG).show();
         }
-
-
     }
 
     public int rewindRoutePoint() {
@@ -354,7 +357,7 @@ public class RouteManager {
     //The nearest distance and bearing are only calculated here, so call this before getting those
     public void setCurrentPositionAndBearing(double latitude, double longitude, double elevation, double bearing) {
         currentPositionGeo = new Point(longitude, latitude);
-        WGS84 geo = new WGS84(longitude, latitude);
+        WGS84 geo = new WGS84(latitude,longitude);
         // Project to UTM
         UTM utm = new UTM(geo);
         currentPositionUTM = new Point(utm.getEasting(), utm.getNorthing());

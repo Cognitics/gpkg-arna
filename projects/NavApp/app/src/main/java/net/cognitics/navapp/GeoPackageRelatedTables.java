@@ -48,6 +48,19 @@ public class GeoPackageRelatedTables {
 
     }
 
+    /*
+    // Get unique content types from related media, and return all the relationships
+    // that have content of that type.
+    ArrayList<RelatedTablesRelationship> getRelationships(String layer, String content_type) {
+        ArrayList<RelatedTablesRelationship> contentSpecificRelationships = new ArrayList<>();
+        ArrayList<RelatedTablesRelationship> relationships = getRelationships(layer);
+        for(RelatedTablesRelationship relationship : relationships) {
+            //if(relationship.relationshipName)
+        }
+
+        return contentSpecificRelationships;
+    }
+    */
     ArrayList<RelatedTablesRelationship> getRelationships(String layer)
     {
         ArrayList<RelatedTablesRelationship> relationships = new ArrayList<RelatedTablesRelationship>();
@@ -157,7 +170,7 @@ public class GeoPackageRelatedTables {
     }
     public void addFeatureRelationship(RelatedTablesRelationship relationship, int baseFID, int relatedFID)
     {
-        String query = String.format("INSERT INTO %s (base_id,related_id) VALUES(%d,%d)");
+        String query = String.format("INSERT INTO %s (base_id,related_id) VALUES(%d,%d)",relationship.mappingTableName,baseFID,relatedFID);
         Cursor cursor = sqliteDb.rawQuery(query, null);
         try {
             cursor.moveToFirst();
@@ -194,6 +207,8 @@ public class GeoPackageRelatedTables {
         } finally {
             cursor.close();
         }
+
+        // Don't forget to save the contents
         return fid;
     }
 }

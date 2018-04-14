@@ -51,12 +51,6 @@ public class PointFeature {
         utmCoordinates = new UTM(geoCoordinates);
     }
 
-    public String getRelatedMedia()
-    {
-        //ArrayList<RelatedTablesRelationship> relationships = GeoPackageRelatedTables
-        return "xxx";
-    }
-
     public void setRelatedBitmap(byte[] blob) {
         relatedBitmap = blob;
     }
