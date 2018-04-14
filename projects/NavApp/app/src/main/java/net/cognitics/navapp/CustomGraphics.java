@@ -76,8 +76,7 @@ public class CustomGraphics extends View
             }
         }
     }
-
-
+    
     public void updatePositions(){
         int width = camera.getMeasuredWidth();
         int height = camera.getMeasuredHeight();
