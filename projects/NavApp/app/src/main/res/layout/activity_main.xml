@@ -5,8 +5,7 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="net.cognitics.navapp.MainActivity"
-    android:id="@+id/rLayout"
-    >
+    android:id="@+id/rLayout">
 
 
     <include layout="@layout/content_main" />
@@ -66,8 +65,8 @@ tools:context="net.cognitics.navapp.MainActivity"
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="196dp"
-        android:layout_height="128dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"

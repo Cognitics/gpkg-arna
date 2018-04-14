@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -14,7 +15,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.Image;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v13.app.ActivityCompat;
@@ -43,6 +46,7 @@ import android.widget.Toast;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
@@ -296,6 +300,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             recreate();
 
         } else if ((requestCode == REQUEST_PICK_PHOTO) && resultCode == Activity.RESULT_OK) {
+
+            Uri photoUri;
+            photoUri = data.getData();
+            String[] filePathColumn = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = getContentResolver().query(photoUri, filePathColumn, null, null,
+                    null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+            Bitmap aBitmap = BitmapFactory.decodeFile(picturePath);
+            int thumbFactor = 5;
+            Bitmap thumb = Bitmap.createScaledBitmap(aBitmap, aBitmap.getWidth()/thumbFactor, aBitmap.getHeight()/thumbFactor, false);
+            ImageButton mImageView = (ImageButton) findViewById(R.id.imageButton);
+            mImageView.setImageBitmap(thumb);
+            recreate();
 
         }
         // We don't check resultCode for preferences since there is only back/cancel to get out
