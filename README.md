@@ -11,7 +11,8 @@ This was our very first Android application ever. The code is still a bit messy,
  - Select a GeoPackage file and route from the "SELECT ROUTE" button on the top right of the screen
  - The white line from the bottom middle of the screen points you to the next waypoint in the route line
  - The white/black marker identifies the next Critical Navigation Point (CNP) in the route. The CNP closest to the waypoint in the route will be displayed
- - If there is an related image for the CNP in the GeoPackage, using the Related Tables Extension, it will appear in the bottom right of the screen
+ - If there is an related image for the CNP in the GeoPackage, using the Related Tables Extension (RTE), it will appear in the bottom right of the screen
+ - **You can add a new image and RTE relationship to the current CNP** by clicking on the black/white CNP marker. You can use the camera to take a picture, or you can select a file from the phone's gallery.
  - The 'pause' button near the bottom middle of the screen will switch to manual navigation mode. In this mode, you select the next waypoint with the forward button and the previous waypoint is selected with the rewind button.
  - Pressing the 'play' button while in manual navigation mode will switch back to automatic navigation mode.
  - In automatic navigation mode, the route line will point to the next waypoint on the route. If you wander too far from the route, the line will point towards the nearest heading to intercept and return to the route. The distance you must be to be considered off route is 25 meters by default, and is configurable in the settings dialog.
