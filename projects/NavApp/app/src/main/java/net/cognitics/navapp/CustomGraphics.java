@@ -75,8 +75,10 @@ public class CustomGraphics extends View {
 
 
     public void updatePositions() {
+
         if(camera==null)
             return;
+        
         int width = camera.getMeasuredWidth();
         int height = camera.getMeasuredHeight();
         for (NavPoint n : navMap.values()) {
