@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float I[] = new float[9];
     private float Rot[] = new float[9];
     int resumeCamera = 0;
-    static final float ALPHA = 0.05f;
+    static float prefALPHA = 0.2f;
 
     static final int ROUTE_SELECT_REQUEST = 1;
     static final int CNP_RT_TEST_REQUEST = 3;
@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static Boolean prefDisplayCNPPhotos = TRUE;
     public static Boolean prefGroupCNPMarkers = TRUE;
     public static Boolean prefDisplayPOI = TRUE;
-    public static float prefCNPArrivalDistance = 10;
-    public static float prefCNPOffRouteDistance = 25;
+    public static float prefCNPArrivalDistance = 25;
+    public static float prefCNPOffRouteDistance = 50;
 
     //I can't find a way to pass this to the take photo intent, so we're using a static right now.
     public static PointFeature sPhotoFeature;
@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         prefDisplayPOI = preferences.getBoolean("display_poi", TRUE);
         prefCNPOffRouteDistance = Float.parseFloat(preferences.getString("cnp_off_route_distance", "25"));
         prefCNPArrivalDistance = Float.parseFloat(preferences.getString("cnp_arrival_distance", "10"));
+        prefALPHA = Float.parseFloat(preferences.getString("alpha_value","0.2"));
     }
 
     /*
@@ -347,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             prefDisplayPOI = preferences.getBoolean("display_poi", TRUE);
             prefCNPOffRouteDistance = Float.parseFloat(preferences.getString("cnp_off_route_distance", "25"));
             prefCNPArrivalDistance = Float.parseFloat(preferences.getString("cnp_arrival_distance", "10"));
+            prefALPHA = Float.parseFloat(preferences.getString("alpha_value","0.2"));
             recreate();
         }
     }
@@ -441,9 +443,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_UI);
+                SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_UI);
+                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -606,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected float[] lowPass(float[] input, float[] output) {
         if (output == null) return input;
         for (int i = 0; i < input.length; i++) {
-            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+            output[i] = output[i] + prefALPHA * (input[i] - output[i]);
         }
         return output;
     }

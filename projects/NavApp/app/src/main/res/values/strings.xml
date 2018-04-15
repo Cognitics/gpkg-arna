@@ -16,17 +16,21 @@
         you will automatically be placed at the routing segment nearest to your current location.
     </string>
 
-    <string name="pref_default_arrival_distance">10</string>
+    <string name="pref_default_arrival_distance">25</string>
     <string name="pref_description_default_arrival_distance">When you are within this distance of a CNP,
         you will automatically be routed to the next navigation point. With this disabled, you will have to
         select next waypoint on the screen as you navigate.</string>
     <string name="pref_title_arrival_distance">Arrival Distance</string>
 
-    <string name="pref_default_off_route_distance">25</string>
+    <string name="pref_default_off_route_distance">50</string>
     <string name="pref_description_default_off_route_distance">When your location from the route is
         further away than this distance, your next navigation point will be directly towards the route,
         and not towards the next CNP. When return to the route, navigation will resume normally.</string>
     <string name="pref_title_off_route_distance">Off-Route Distance</string>
+
+    <string name="pref_default_alpha">0.2</string>
+    <string name="pref_description_alpha">This is a smoothing constant you can change to smooth the sensor readings. A larger value will result in less smoothing, and a faster, but more jerky heading change on the screen. A lower value will be smoother but less responsive.</string>
+    <string name="pref_title_alpha">Sensor Smoothing</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">

@@ -53,5 +53,15 @@
         android:singleLine="true"
         android:title="@string/pref_title_off_route_distance" />
 
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_alpha"
+        android:summary="@string/pref_description_alpha"
+        android:inputType="numberDecimal"
+        android:key="alpha_value"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_alpha" />
+
 
 </PreferenceScreen>
