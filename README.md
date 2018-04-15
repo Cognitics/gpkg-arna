@@ -24,6 +24,7 @@ Please email me at kbentley@cognitics.net if you have any questions or comments.
  - In automatic navigation mode, the route line will point to the next waypoint on the route. If you wander too far from the route, the line will point towards the nearest heading to intercept and return to the route. The distance you must be to be considered off route is 25 meters by default, and is configurable in the settings dialog.
  - In automatic mode, once you are a certain distance from the next waypoint (10 meters by default, configurable through the settings screen), the waypoint will automatically be advanced to the next on the route.
  - The pink markers are Points of Interest (POIs) for the selected route
+ - In the settings dialog there is a configurable Sensor Smoothing value. A higher number will result in less smoothing, but will result in more jerky/noisy indicators. A lower value will add some lag to the heading indicator (and also the position of the markers on-screen). A 
 
 # Known Issues
   - Group Overlapping CNP Markers has not been implemented yet, so if there are many markers in the same part of the screen, the text may overlap.
